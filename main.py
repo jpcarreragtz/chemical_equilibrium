@@ -24,6 +24,7 @@ from equilibrium import (
     format_table, run_checks_method_a, run_checks_method_b, selectivity,
     solve_extents, to_atm, verify_reactions_balanced, yield_fraction,
 )
+from selfcheck import Problem, validate, validate_sweep
 
 # Atomic compositions of every species used in the tests (for atom checks).
 ATOMS = {
@@ -199,6 +200,10 @@ def test_3(Xe_ref: float, y_ref: Dict[str, float]) -> bool:
 
     ok = run_checks_method_a(res, n0, atoms=ATOMS)
 
+    problem = Problem(species=species, n0=n0, nu=nu, K=[K], P=P, P0=1.0,
+                      atoms=ATOMS, T=T, pressure_unit="atm", label="Test 3")
+    ok &= validate(problem, res).ok
+
     print("\n  Verification vs Test 1 (Method B):")
     ok &= report("X_e", X, Xe_ref, rel_tol=1e-4)
     for sp in species:
@@ -251,11 +256,18 @@ def test_4() -> bool:
 
     ok = True
     columns: Dict[float, List[float]] = {}
+    xi_by_T: Dict[float, Tuple[float, ...]] = {}
     for T, K in K_table.items():
         print(f"\n  --- T = {T:g} K,  K = {K} ---")
         res = solve_extents(species, n0, nu, list(K), P=1.0, P0=1.0,
                             atoms=ATOMS)
         ok &= run_checks_method_a(res, n0, atoms=ATOMS)
+
+        problem = Problem(species=species, n0=n0, nu=nu, K=list(K), P=1.0,
+                          P0=1.0, atoms=ATOMS, inerts=["N2"], T=T,
+                          pressure_unit="bar", label="Test 4")
+        ok &= validate(problem, res).ok
+        xi_by_T[T] = tuple(res.xi)
 
         n = res.moles
         X = conversion(n_A0, n["C3H8"])
@@ -278,6 +290,8 @@ def test_4() -> bool:
           "(selectivity S i/j = mol i / mol j among C-containing products):")
     print("  " + format_table(rows, ["Quantity"] +
           [f"T = {T:g} K" for T in temps]).replace("\n", "\n  "))
+
+    ok &= validate_sweep(K_table, xi_by_T).ok
 
     print(f"\n  [{'PASS' if ok else 'FAIL'}] all equilibrium/atom/"
           f"non-negativity checks at the three temperatures")

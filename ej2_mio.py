@@ -23,6 +23,7 @@ Rendimientos de H2:
 """
 
 from equilibrium import solve_extents
+from selfcheck import Problem, validate, validate_sweep
 
 # ---------- Especies (el orden define las columnas de nu) ----------
 especies = ["C3H8", "H2O", "CO", "H2", "CO2", "CH4", "N2"]
@@ -153,6 +154,12 @@ for T, K in casos.items():
 
     resumen.append((T, X, S_ref, S_CO, S_CO2, S_CH4, Y_H2, H2_CO, H2_COx, Y_H2_alim))
 
+    # ---------- Autovalidación (selfcheck): puntos 1-10 y 12 ----------
+    problema = Problem(species=especies, n0=n0, nu=nu, K=K, P=P, P0=1.0,
+                       atoms=atomos, inerts=["N2"], T=T, pressure_unit="bar",
+                       label="Reformado de propano")
+    validate(problema, res)
+
 # ---------- Tabla final (mismo formato que la clave de respuestas) ----------
 print(f"\n{'='*64}\n  Conversión, selectividades y rendimiento\n{'='*64}")
 print(f"  {'T_K':>5s} {'X_C3H8':>7s} {'S_reformado':>12s} {'S_CO':>9s} {'S_CO2':>9s} "
@@ -193,3 +200,6 @@ for T, X, S_ref, S_CO, S_CO2, S_CH4, Y_H2, H2_CO, H2_COx, Y_H2_alim in resumen:
               f"|dif| = {dif:.1e}   [{'PASS' if ok else 'FAIL'}]")
 print(f"\n  Resultado: "
       f"{'TODOS los valores PASS' if todo_pass else '*** HAY VALORES FAIL ***'}")
+
+# ---------- Autovalidación del barrido: Le Chatelier (punto 11) ----------
+validate_sweep(casos, xi_resueltos)
