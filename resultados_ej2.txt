@@ -1,0 +1,131 @@
+
+================================================================
+  T = 700 K
+================================================================
+  a) Avances de reacción:
+     xi_1 (reformado)  = 0.24044 mol
+     xi_2 (WGS)        = 0.69089 mol
+     xi_3 (metanación) = 0.75956 mol
+
+  b) Moles y fracciones mol   (n_T = 5.5 + 6 xi_1 = 6.94262 mol)
+     Especie                    balance    n_i (mol)        y_i
+     C3H8                 1 - xi1 - xi3   6.6902e-10    0.00000
+     H2O                4 - 3 xi1 - xi2       2.5878    0.37274
+     CO                     3 xi1 - xi2     0.030416    0.00438
+     H2             7 xi1 + xi2 - 2 xi3      0.85482    0.12313
+     CO2                            xi2      0.69089    0.09951
+     CH4                          3 xi3       2.2787    0.32822
+     N2                             0.5          0.5    0.07202
+                                           sum y_i =   1.000000
+
+  c) Conversión del propano  X = (1 - n_C3H8)/1 = xi1 + xi3 = 1.00000
+     Fracción vía reformado  S_reformado = xi1/(xi1+xi3) = 0.24044
+
+  d) Selectividades  S_i = n_i / (n_CO + n_CO2 + n_CH4),  denominador = 3.00000 mol
+     S_CO = 0.01014   S_CO2 = 0.23030   S_CH4 = 0.75956   (suma = 1.00000)
+
+  e) Rendimiento  Y_H2 = n_H2/10 = 0.08548
+     Y_H2 (máx. por alimentación) = n_H2/8 = 0.10685
+     H2/CO = 28.1046    H2/COx = n_H2/(n_CO+n_CO2) = 1.1851
+
+================================================================
+  T = 900 K
+================================================================
+  a) Avances de reacción:
+     xi_1 (reformado)  = 0.51885 mol
+     xi_2 (WGS)        = 0.69625 mol
+     xi_3 (metanación) = 0.48115 mol
+
+  b) Moles y fracciones mol   (n_T = 5.5 + 6 xi_1 = 8.61313 mol)
+     Especie                    balance    n_i (mol)        y_i
+     C3H8                 1 - xi1 - xi3   1.0676e-09    0.00000
+     H2O                4 - 3 xi1 - xi2       1.7472    0.20285
+     CO                     3 xi1 - xi2      0.86032    0.09988
+     H2             7 xi1 + xi2 - 2 xi3       3.3659    0.39079
+     CO2                            xi2      0.69625    0.08084
+     CH4                          3 xi3       1.4434    0.16759
+     N2                             0.5          0.5    0.05805
+                                           sum y_i =   1.000000
+
+  c) Conversión del propano  X = (1 - n_C3H8)/1 = xi1 + xi3 = 1.00000
+     Fracción vía reformado  S_reformado = xi1/(xi1+xi3) = 0.51885
+
+  d) Selectividades  S_i = n_i / (n_CO + n_CO2 + n_CH4),  denominador = 3.00000 mol
+     S_CO = 0.28677   S_CO2 = 0.23208   S_CH4 = 0.48115   (suma = 1.00000)
+
+  e) Rendimiento  Y_H2 = n_H2/10 = 0.33659
+     Y_H2 (máx. por alimentación) = n_H2/8 = 0.42074
+     H2/CO = 3.9124    H2/COx = n_H2/(n_CO+n_CO2) = 2.1624
+
+================================================================
+  T = 1000 K
+================================================================
+  a) Avances de reacción:
+     xi_1 (reformado)  = 0.75718 mol
+     xi_2 (WGS)        = 0.41774 mol
+     xi_3 (metanación) = 0.24282 mol
+
+  b) Moles y fracciones mol   (n_T = 5.5 + 6 xi_1 = 10.04310 mol)
+     Especie                    balance    n_i (mol)        y_i
+     C3H8                 1 - xi1 - xi3   2.8193e-10    0.00000
+     H2O                4 - 3 xi1 - xi2       1.3107    0.13051
+     CO                     3 xi1 - xi2       1.8538    0.18459
+     H2             7 xi1 + xi2 - 2 xi3       5.2324    0.52099
+     CO2                            xi2      0.41774    0.04159
+     CH4                          3 xi3      0.72845    0.07253
+     N2                             0.5          0.5    0.04979
+                                           sum y_i =   1.000000
+
+  c) Conversión del propano  X = (1 - n_C3H8)/1 = xi1 + xi3 = 1.00000
+     Fracción vía reformado  S_reformado = xi1/(xi1+xi3) = 0.75718
+
+  d) Selectividades  S_i = n_i / (n_CO + n_CO2 + n_CH4),  denominador = 3.00000 mol
+     S_CO = 0.61794   S_CO2 = 0.13925   S_CH4 = 0.24282   (suma = 1.00000)
+
+  e) Rendimiento  Y_H2 = n_H2/10 = 0.52324
+     Y_H2 (máx. por alimentación) = n_H2/8 = 0.65405
+     H2/CO = 2.8225    H2/COx = n_H2/(n_CO+n_CO2) = 2.3034
+
+================================================================
+  Conversión, selectividades y rendimiento
+================================================================
+    T_K  X_C3H8  S_reformado      S_CO     S_CO2     S_CH4      Y_H2 Y_H2_alim    H2_CO   H2_COx
+    700       1      0.24044   0.01014   0.23030   0.75956   0.08548   0.10685  28.1046   1.1851
+    900       1      0.51885   0.28677   0.23208   0.48115   0.33659   0.42074   3.9124   2.1624
+   1000       1      0.75718   0.61794   0.13925   0.24282   0.52324   0.65405   2.8225   2.3034
+
+================================================================
+  Verificación contra la clave del profesor (tol. rel. 1e-4)
+================================================================
+  T = 700 K
+    xi_1    calc =   0.24044   clave =   0.24044   |dif| = 3.7e-06   [PASS]
+    xi_2    calc =   0.69089   clave =   0.69089   |dif| = 3.3e-06   [PASS]
+    xi_3    calc =   0.75956   clave =   0.75956   |dif| = 3.7e-06   [PASS]
+    S_CO    calc =   0.01014   clave =   0.01014   |dif| = 4.4e-07   [PASS]
+    S_CO2   calc =   0.23030   clave =   0.23030   |dif| = 2.2e-06   [PASS]
+    S_CH4   calc =   0.75956   clave =   0.75956   |dif| = 3.7e-06   [PASS]
+    Y_H2    calc =   0.08548   clave =   0.08548   |dif| = 3.3e-08   [PASS]
+    H2_CO   calc =  28.10460   clave =  28.10500   |dif| = 4.0e-04   [PASS]
+    H2_COx  calc =   1.18510   clave =   1.18510   |dif| = 4.1e-06   [PASS]
+  T = 900 K
+    xi_1    calc =   0.51885   clave =   0.51886   |dif| = 5.0e-06   [PASS]
+    xi_2    calc =   0.69625   clave =   0.69625   |dif| = 1.2e-06   [PASS]
+    xi_3    calc =   0.48115   clave =   0.48114   |dif| = 5.0e-06   [PASS]
+    S_CO    calc =   0.28677   clave =   0.28677   |dif| = 2.1e-06   [PASS]
+    S_CO2   calc =   0.23208   clave =   0.23208   |dif| = 2.9e-06   [PASS]
+    S_CH4   calc =   0.48115   clave =   0.48114   |dif| = 5.0e-06   [PASS]
+    Y_H2    calc =   0.33659   clave =   0.33659   |dif| = 4.4e-06   [PASS]
+    H2_CO   calc =   3.91245   clave =   3.91240   |dif| = 4.9e-05   [PASS]
+    H2_COx  calc =   2.16242   clave =   2.16240   |dif| = 1.8e-05   [PASS]
+  T = 1000 K
+    xi_1    calc =   0.75718   clave =   0.75718   |dif| = 3.2e-06   [PASS]
+    xi_2    calc =   0.41774   clave =   0.41774   |dif| = 2.4e-06   [PASS]
+    xi_3    calc =   0.24282   clave =   0.24282   |dif| = 3.2e-06   [PASS]
+    S_CO    calc =   0.61794   clave =   0.61794   |dif| = 2.7e-06   [PASS]
+    S_CO2   calc =   0.13925   clave =   0.13925   |dif| = 4.1e-06   [PASS]
+    S_CH4   calc =   0.24282   clave =   0.24282   |dif| = 3.2e-06   [PASS]
+    Y_H2    calc =   0.52324   clave =   0.52324   |dif| = 1.4e-06   [PASS]
+    H2_CO   calc =   2.82250   clave =   2.82250   |dif| = 1.1e-06   [PASS]
+    H2_COx  calc =   2.30344   clave =   2.30340   |dif| = 4.4e-05   [PASS]
+
+  Resultado: TODOS los valores PASS
