@@ -15,16 +15,15 @@ mediciones (sistema lineal). Fase gas (solo afecta y_i, no los balances).
 
 import csv
 import os
+import pathlib
 import sys
 
 _DIR = os.path.dirname(os.path.abspath(__file__))
-_ROOT = (_DIR if os.path.exists(os.path.join(_DIR, "equilibrium.py"))
-         else os.path.dirname(_DIR))
-sys.path.insert(0, _ROOT)
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))  # raíz del proyecto
 
-from equilibrium import atom_totals, format_table
-from reactions import build_system
-from selfcheck import Report
+from core.equilibrium import atom_totals, format_table
+from core.reactions import build_system
+from core.selfcheck import Report
 
 # ══════════════════════════ INPUTS ════════════════════════════════════════
 reacciones = ["C2H4 + 1/2 O2 = C2H4O", "C2H4 + 3 O2 = 2 CO2 + 2 H2O"]

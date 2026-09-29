@@ -15,7 +15,10 @@ Esperado (cálculo a mano): K(500) ~ 1.13;
 A mayor P baja la conversión porque delta = +1 (Le Chatelier).
 """
 
-from exercise import run_exercise
+import sys, pathlib
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))  # raíz del proyecto
+
+from core.exercise import run_exercise
 
 # ══════════════════════════ INPUTS ════════════════════════════════════════
 titulo_base = "Craqueo de n-butano (Koretsky 14-5)"

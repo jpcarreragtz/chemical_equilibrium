@@ -9,7 +9,10 @@ Alimentación 1 mol CH4 + 1 mol H2O; salida en equilibrio a 700 K y
 K(T) de las Tablas C.4/C.1 de SVA vía ec. 13.18 (data/sva_tables.json).
 """
 
-from exercise import run_exercise
+import sys, pathlib
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))  # raíz del proyecto
+
+from core.exercise import run_exercise
 
 # ══════════════════════════ INPUTS ════════════════════════════════════════
 titulo = "Parcial P3: reformado de metano"

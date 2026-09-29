@@ -32,8 +32,9 @@ T_REF = 298.15       # K
 
 # Tablas C.1/C.4 capturadas en JSON (ver data/raw/LEEME.txt sobre su estatus
 # de verificación)
-RUTA_TABLAS = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                           "data", "sva_tables.json")
+from . import DATA
+
+RUTA_TABLAS = str(DATA / "sva_tables.json")
 
 
 # ----------------------------------------------------------------------------

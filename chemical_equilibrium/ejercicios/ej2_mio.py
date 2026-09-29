@@ -22,8 +22,11 @@ Rendimientos de H2:
     Y_H2 (alimentación) = n_H2 / 8    (máximo con 4 mol H2O disponibles)
 """
 
-from equilibrium import solve_extents
-from selfcheck import Problem, validate, validate_sweep
+import sys, pathlib
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))  # raíz del proyecto
+
+from core.equilibrium import solve_extents
+from core.selfcheck import Problem, validate, validate_sweep
 
 # ---------- Especies (el orden define las columnas de nu) ----------
 especies = ["C3H8", "H2O", "CO", "H2", "CO2", "CH4", "N2"]

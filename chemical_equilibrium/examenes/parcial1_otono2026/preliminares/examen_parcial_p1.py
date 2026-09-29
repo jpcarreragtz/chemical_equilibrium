@@ -7,9 +7,12 @@ b) X_Ae con K_C = 0.2 mol²/dm⁶.
 c) F_i y v cuando X = 70 % de X_Ae.
 """
 
-from equilibrium import (R_ATM, StoichiometricTable, format_table,
+import sys, pathlib
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))  # raíz del proyecto
+
+from core.equilibrium import (R_ATM, StoichiometricTable, format_table,
                          solve_extents)
-from selfcheck import Problem, validate
+from core.selfcheck import Problem, validate
 
 T, P_atm, v0, Kc = 500.0, 10.0, 500.0, 0.2      # K, atm, dm3/s, mol2/dm6
 

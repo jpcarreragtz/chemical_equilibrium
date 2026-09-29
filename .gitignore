@@ -20,7 +20,8 @@ Tablas SVA/
 # Editor
 .vscode/
 
-# Salidas regenerables sueltas del solver
-# (las de chemical_equilibrium/entrega_parcial1/ SÍ se versionan)
-chemical_equilibrium/resultados_*.csv
-chemical_equilibrium/grafica_*.png
+# Salidas regenerables del solver (las entregas congeladas SÍ se versionan:
+# chemical_equilibrium/examenes/.../entrega_parcial1/ y ejercicios/entrega_s15/)
+chemical_equilibrium/salidas/
+chemical_equilibrium/examenes/*/resultados_P*.csv
+chemical_equilibrium/examenes/*/grafica_P*.png

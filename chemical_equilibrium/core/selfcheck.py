@@ -54,7 +54,7 @@ from typing import Dict, List, Optional, Sequence, Tuple
 import numpy as np
 from scipy.optimize import least_squares
 
-from equilibrium import (
+from .equilibrium import (
     AtomComposition, ExtentResult, StoichiometricTable, Ky_to_Kc,
     atom_totals, reaction_element_imbalance, solve_extents,
 )

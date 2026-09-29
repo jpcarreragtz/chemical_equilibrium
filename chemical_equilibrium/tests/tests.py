@@ -17,14 +17,17 @@ Casos:
 
 from __future__ import annotations
 
+import sys, pathlib
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))  # raíz del proyecto
+
 import sys
 from math import exp
 
 import numpy as np
 
-from equilibrium import R_ATM, StoichiometricTable, solve_extents
-from reactions import build_system, parse_formula, parse_reaction
-from thermo import K_vant_hoff, R_J, T_REF, reaction_thermo
+from core.equilibrium import R_ATM, StoichiometricTable, solve_extents
+from core.reactions import build_system, parse_formula, parse_reaction
+from core.thermo import K_vant_hoff, R_J, T_REF, reaction_thermo
 
 FALLAS = []
 
@@ -176,7 +179,7 @@ def caso_g():
     head("g) Módulo termo: ec. 13.18 vs integración numérica de Van't Hoff, "
          "y ancla física")
     from scipy.integrate import quad
-    from thermo import icph
+    from core.thermo import icph
 
     rxns = [("R1 reformado", parse_reaction("C3H8 + 3 H2O = 3 CO + 7 H2")),
             ("WGS", parse_reaction("CO + H2O = CO2 + H2")),
@@ -266,7 +269,7 @@ def caso_i():
 def caso_j():
     head("j) data/sva_tables.json vs los valores del curso que me dictaste "
          "(bloque P3)")
-    from thermo import cargar_datos
+    from core.thermo import cargar_datos
     # Referencia INDEPENDIENTE del JSON: los números que el usuario dictó
     # en el enunciado de P3 (examen_p2026_3).
     ref = {
@@ -298,7 +301,7 @@ def caso_j():
 def caso_k():
     head("k) Craqueo de n-butano a 500 K (Koretsky 14-5): K termo del JSON "
          "y xi a 1 y 25 bar")
-    from thermo import cargar_datos
+    from core.thermo import cargar_datos
     nud = parse_reaction("C4H10 = C3H6 + CH4")
     datos = cargar_datos(["C4H10", "C3H6", "CH4"])
     t = reaction_thermo(nud, datos, 500.0)
@@ -314,9 +317,53 @@ def caso_k():
         check(f"xi a {P:g} bar", res.xi[0], xi_exp, atol=0.05)
 
 
+# ---------------------------------------------------------------- caso l
+def caso_l():
+    head("l) nonideal.py: phi de Pitzer y gammas de Wilson (Sesiones 13/15)")
+    import warnings as _w
+    from core.nonideal import (phi_pitzer, wilson_gamma, wilson_gamma_inf,
+                          wilson_lambdas)
+    # phi -> 1 en el límite de gas ideal (Tr alto, Pr bajo)
+    with _w.catch_warnings():
+        _w.simplefilter("ignore")
+        r = phi_pitzer(1400.0, 1.0, 282.3, 50.40, 0.087)   # C2H4, Tr ~ 5
+        check("phi(Tr~5, Pr~0.02) ~ 1", r["phi"], 1.0, atol=0.01)
+        # valor cotejado a mano (H2O a 473.15 K y 34.5 bar, slides S13):
+        # Tr=0.7312, Pr=0.1564, B0=-0.6134, B1=-0.5016 -> phi = 0.845
+        r2 = phi_pitzer(473.15, 34.5, 647.1, 220.55, 0.345)
+        check("phi H2O(473.15 K, 34.5 bar) vs mano", r2["phi"], 0.845,
+              rtol=2e-3)
+        check("  Tr reportada", r2["Tr"], 0.7312, rtol=1e-3)
+        check("  Pr reportada", r2["Pr"], 0.1564, rtol=1e-3)
+        # el warning de zona virial debe dispararse (EtOH a 34.5 bar)
+        with _w.catch_warnings(record=True) as avisos:
+            _w.simplefilter("always")
+            r3 = phi_pitzer(473.15, 34.5, 513.9, 61.48, 0.645)
+        ok = (not r3["valido"]) and len(avisos) == 1
+        print(f"  [{'PASS' if ok else 'FAIL'}] warning fuera de zona "
+              f"virial (EtOH: Vr = {r3['Vr']:.2f} < 2, "
+              f"{len(avisos)} aviso)")
+        if not ok:
+            FALLAS.append("warning virial")
+    # Wilson etanol(1)/agua(2), DECHEMA, 473.15 K
+    W = dict(V1=58.69, V2=18.07, a12=382.30, a21=955.45)
+    L12, L21 = wilson_lambdas(473.15, **W)
+    check("Lambda12", L12, 0.205, rtol=2e-3)
+    check("Lambda21", L21, 1.176, rtol=2e-3)
+    g1, _ = wilson_gamma(1.0, 473.15, **W)
+    _, g2 = wilson_gamma(0.0, 473.15, **W)
+    check("gamma1(x1=1) = 1", g1, 1.0, atol=1e-12)
+    check("gamma2(x2=1) = 1", g2, 1.0, atol=1e-12)
+    g1i_num, _ = wilson_gamma(1e-12, 473.15, **W)
+    _, g2i_num = wilson_gamma(1.0 - 1e-12, 473.15, **W)
+    g1i, g2i = wilson_gamma_inf(473.15, **W)
+    check("gamma1_inf numérica vs cerrada", g1i_num, g1i, rtol=1e-6)
+    check("gamma2_inf numérica vs cerrada", g2i_num, g2i, rtol=1e-6)
+
+
 if __name__ == "__main__":
     for f in (caso_a, caso_b, caso_c, caso_d, caso_e, caso_f, caso_g,
-              caso_h, caso_i, caso_j, caso_k):
+              caso_h, caso_i, caso_j, caso_k, caso_l):
         f()
     print(f"\n{'=' * 72}")
     if FALLAS:

@@ -15,7 +15,10 @@ Esperado: C_T0 = 0.04252 mol/L, C_H2,0 = 0.02126 mol/L, eps = -0.5,
 X_H2,e ~ 0.206.
 """
 
-from exercise import run_exercise
+import sys, pathlib
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))  # raíz del proyecto
+
+from core.exercise import run_exercise
 
 # ══════════════════════════ INPUTS ════════════════════════════════════════
 titulo = "P1 examen: hidrogenacion de o-cresol"
@@ -46,7 +49,7 @@ resultado = run_exercise(
 # ═══════════ Inciso (a): tabla estequiométrica y C_i, P_i a X = 0.90 ══════
 # Método B (Fogler) normalizado por mol del limitante H2 (nu_B = -1):
 #   v = v0(1 + eps·X) a T,P constantes;  C_i = F_i/v;  P_i = C_i·R·T
-from equilibrium import R_ATM, StoichiometricTable, format_table
+from core.equilibrium import R_ATM, StoichiometricTable, format_table
 
 T0 = 573.15
 tbl = StoichiometricTable(

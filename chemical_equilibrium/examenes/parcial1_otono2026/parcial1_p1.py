@@ -13,17 +13,16 @@ fragmentos conservados (A = Rm·Sm2) para poder verificar el balance.
 
 import csv
 import os
+import pathlib
 import sys
 
 _DIR = os.path.dirname(os.path.abspath(__file__))
-_ROOT = (_DIR if os.path.exists(os.path.join(_DIR, "equilibrium.py"))
-         else os.path.dirname(_DIR))
-sys.path.insert(0, _ROOT)
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))  # raíz del proyecto
 
 import numpy as np
 
-from equilibrium import R_ATM, StoichiometricTable, format_table, solve_extents
-from selfcheck import Problem, validate
+from core.equilibrium import R_ATM, StoichiometricTable, format_table, solve_extents
+from core.selfcheck import Problem, validate
 
 # ══════════════════════════ INPUTS ════════════════════════════════════════
 T, P_atm, v0, Kc = 500.0, 10.0, 500.0, 0.2   # K, atm, dm³/s, mol²/dm⁶

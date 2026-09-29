@@ -11,7 +11,10 @@ K(350) = 490.
 Esperado: xi = 4.392, y_C4H2O3 = 0.0348, y_H2O = 0.139, X_C4H10 = 0.878.
 """
 
-from exercise import run_exercise
+import sys, pathlib
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))  # raíz del proyecto
+
+from core.exercise import run_exercise
 
 # ══════════════════════════ INPUTS ════════════════════════════════════════
 titulo = "P2 examen: n-butano a anhidrido maleico"

@@ -13,19 +13,18 @@ la ec. 13.18 de SVA con datos de data/sva_tables.json (Tablas C.1/C.4).
 
 import csv
 import os
+import pathlib
 import sys
 
 _DIR = os.path.dirname(os.path.abspath(__file__))
-_ROOT = (_DIR if os.path.exists(os.path.join(_DIR, "equilibrium.py"))
-         else os.path.dirname(_DIR))
-sys.path.insert(0, _ROOT)
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))  # raíz del proyecto
 
 import numpy as np
 
-from equilibrium import atom_totals, format_table, solve_extents
-from reactions import build_system, parse_reaction
-from selfcheck import Problem, validate, validate_sweep
-from thermo import cargar_datos, reaction_thermo
+from core.equilibrium import atom_totals, format_table, solve_extents
+from core.reactions import build_system, parse_reaction
+from core.selfcheck import Problem, validate, validate_sweep
+from core.thermo import cargar_datos, reaction_thermo
 
 # ══════════════════════════ INPUTS ════════════════════════════════════════
 reacciones = ["CH4 + H2O = CO + 3 H2", "CO + H2O = CO2 + H2"]

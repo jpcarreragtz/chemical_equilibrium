@@ -30,7 +30,10 @@ C3H8 = C2H4 + CH4 y C3H8 = C3H6 + H2, 10 mol/s de C3H8, 1 bar,
 T = 650–1000 K, con K calculadas de las Tablas C.1/C.4 de SVA.
 """
 
-from exercise import run_exercise
+import sys, pathlib
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))  # raíz del proyecto
+
+from core.exercise import run_exercise
 
 # ══════════════════════════ INPUTS (edita SOLO esto) ══════════════════════
 titulo = "Pirólisis de propano (caso examen)"

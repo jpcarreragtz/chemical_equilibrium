@@ -1,0 +1,3 @@
+Copia congelada de la entrega del 15/09/2026; los imports apuntan a la estructura
+anterior y no corren desde aquí a propósito. La versión ejecutable está en
+../parcial1_p*.py

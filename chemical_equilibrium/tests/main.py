@@ -15,16 +15,19 @@ Run:  python3 main.py
 
 from __future__ import annotations
 
+import sys, pathlib
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))  # raíz del proyecto
+
 from typing import Dict, List, Tuple
 
 import numpy as np
 
-from equilibrium import (
+from core.equilibrium import (
     R_ATM, ExtentResult, StoichiometricTable, Kc_to_Ky, conversion,
     format_table, run_checks_method_a, run_checks_method_b, selectivity,
     solve_extents, to_atm, verify_reactions_balanced, yield_fraction,
 )
-from selfcheck import Problem, validate, validate_sweep
+from core.selfcheck import Problem, validate, validate_sweep
 
 # Atomic compositions of every species used in the tests (for atom checks).
 ATOMS = {

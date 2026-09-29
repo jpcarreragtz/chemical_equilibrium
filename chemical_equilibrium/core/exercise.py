@@ -26,10 +26,11 @@ from typing import Dict, List, Optional, Sequence
 
 import numpy as np
 
-from equilibrium import Kc_to_Ky, conversion, format_table, solve_extents
-from reactions import build_system, parse_reaction
-from selfcheck import Problem, validate, validate_sweep
-from thermo import cargar_datos, reaction_thermo
+from . import SALIDAS
+from .equilibrium import Kc_to_Ky, conversion, format_table, solve_extents
+from .reactions import build_system, parse_reaction
+from .selfcheck import Problem, validate, validate_sweep
+from .thermo import cargar_datos, reaction_thermo
 
 # Paleta categórica validada (orden FIJO, seguro para daltonismo en pares
 # adyacentes sobre fondo claro); la 9a serie se agrupa en "otras".
@@ -244,8 +245,10 @@ def run_exercise(*, titulo: str = "ejercicio",
     print(f"\n  Autovalidación global: {veredicto} "
           f"({n_fail} FAIL, {n_warn} WARN en {len(reportes)} reportes)")
 
-    # ---------- 4) CSV ----------
-    csv_path = csv_out or f"resultados_{_slug(titulo)}.csv"
+    # ---------- 4) CSV (por omisión a salidas/, nunca a la raíz) ----------
+    if csv_out is None:
+        SALIDAS.mkdir(exist_ok=True)
+    csv_path = csv_out or str(SALIDAS / f"resultados_{_slug(titulo)}.csv")
     _exportar_csv(csv_path, temps, resultados, especies, reacciones,
                   limitante, frac_sym)
     print(f"  CSV exportado: {csv_path}")
@@ -253,7 +256,9 @@ def run_exercise(*, titulo: str = "ejercicio",
     # ---------- 5) gráfica y_i vs T ----------
     png_path = None
     if len(temps) >= 2:
-        png_path = png_out or f"grafica_{_slug(titulo)}.png"
+        if png_out is None:
+            SALIDAS.mkdir(exist_ok=True)
+        png_path = png_out or str(SALIDAS / f"grafica_{_slug(titulo)}.png")
         err = _graficar(png_path, temps, resultados, especies, titulo,
                         frac_sym)
         print(f"  Gráfica {frac_sym}_i vs T: {png_path}" if err is None

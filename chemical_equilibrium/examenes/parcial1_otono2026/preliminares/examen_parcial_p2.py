@@ -9,9 +9,12 @@ Alimentación: 1.5 mol C2H4 + 3 mol O2, 1 bar. A la salida se MIDEN
 equilibrio: los avances salen de las mediciones.
 """
 
-from equilibrium import format_table
-from reactions import build_system
-from selfcheck import Problem, Report
+import sys, pathlib
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))  # raíz del proyecto
+
+from core.equilibrium import format_table
+from core.reactions import build_system
+from core.selfcheck import Problem, Report
 
 reacciones = ["C2H4 + 1/2 O2 = C2H4O", "C2H4 + 3 O2 = 2 CO2 + 2 H2O"]
 alim = {"C2H4": 1.5, "O2": 3.0}
@@ -43,7 +46,7 @@ print("  " + format_table(
     ["Especie", "balance", "n_i (mol)", "y_i"]).replace("\n", "\n  "))
 
 # checks de captura (átomos entrada vs salida)
-from equilibrium import atom_totals
+from core.equilibrium import atom_totals
 ent, sal = atom_totals(alim, atomos), atom_totals(n, atomos)
 print("     check átomos in -> out: " + ", ".join(
     f"{e}: {ent.get(e, 0):g} -> {sal.get(e, 0):g}"

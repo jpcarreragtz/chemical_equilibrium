@@ -2,7 +2,10 @@
 Alimentación: 1 mol C3H8, 4 mol H2O, 0.5 mol N2 (inerte). P = 1 bar.
 Método A (avance de reacción), 3 reacciones simultáneas."""
 
-from equilibrium import (conversion, format_table, run_checks_method_a,
+import sys, pathlib
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))  # raíz del proyecto
+
+from core.equilibrium import (conversion, format_table, run_checks_method_a,
                          selectivity, solve_extents, yield_fraction)
 
 # ---------- Paso 1: especies (el ORDEN aquí manda en todo lo demás) ----------
