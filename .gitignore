@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# macOS / iCloud
+.DS_Store
+*.icloud
+
+# Temporales de Office
+~$*.xlsx
+
+# Material con derechos de autor (libro y apéndices en PDF) y fotos de tablas
+*.pdf
+**/data/raw/
+
+# Carpeta original de la base de datos (versionada como tablas_sva/)
+Tablas SVA/
+
+# Editor
+.vscode/
+
+# Salidas regenerables sueltas del solver
+# (las de chemical_equilibrium/entrega_parcial1/ SÍ se versionan)
+chemical_equilibrium/resultados_*.csv
+chemical_equilibrium/grafica_*.png

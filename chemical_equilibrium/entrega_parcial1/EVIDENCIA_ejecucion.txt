@@ -1,0 +1,304 @@
+EVIDENCIA DE EJECUCIÓN — Parcial 1, Equilibrio Químico
+Fecha/hora: 2026-09-15 10:24:55 CST
+Directorio: /Users/jpcg/Library/Mobile Documents/com~apple~CloudDocs/IBERO/EQ. Químico/chemical_equilibrium/entrega_parcial1
+Python: Python 3.14.6, numpy/scipy: 2.5.1 1.18.0
+
+════════════════════════════════════════════════════════════════════
+$ python3 entrega_parcial1/parcial1_p1.py
+════════════════════════════════════════════════════════════════════
+======================================================================
+  PARCIAL 1 — P1:  A <-> R + 2S   (gas, 10 atm, 500 K)
+======================================================================
+
+1) ENUNCIADO Y SUPUESTOS
+   A <-> R + 2S, gas ideal, operación continua ISOTÉRMICA e
+   ISOBÁRICA: P = 10 atm, T = 500 K, v0 = 500 dm³/s de A PURO.
+   K_C(500 K) = 0.2 mol²/dm⁶ (unidades consistentes con delta = +2).
+   Volumen variable: v = v0(1 + eps·X) a T,P constantes.
+
+2) TABLA ESTEQUIOMÉTRICA (base: A, por mol de A)
+  | Especie | Inicial | Cambio    | Remanente    | Concentración                  |
+  |---------|---------|-----------|--------------|--------------------------------|
+  | A       | n_A0    | -1·n_A0·X | n_A0(1 - X)  | C_A0(1-1X)/(1+2X)·(T0/T)(P/P0) |
+  | R       | 0·n_A0  | +1·n_A0·X | n_A0(0 + 1X) | C_A0(0+1X)/(1+2X)·(T0/T)(P/P0) |
+  | S       | 0·n_A0  | +2·n_A0·X | n_A0(0 + 2X) | C_A0(0+2X)/(1+2X)·(T0/T)(P/P0) |
+
+3) PARÁMETROS EVALUADOS
+   y_A0 = 1 (A puro)      delta = 1+2-1 = 2      eps = y_A0·delta = 2
+   C_A0 = C_T0 = P/(R·T) = 10/(0.08206·500) = 0.24372 mol/dm³
+   F_A0 = C_A0·v0 = 121.86 mol/s
+   F_A = F_A0(1-X)   F_R = F_A0·X   F_S = 2F_A0·X   F_T = F_A0(1+2X)
+   v = v0(1+2X);   C_A = C_A0(1-X)/(1+2X),  C_R = C_A0·X/(1+2X),
+   C_S = 2C_A0·X/(1+2X)
+
+4) ECUACIÓN A RESOLVER (números sustituidos)
+   K_C = C_R·C_S²/C_A = 4·C_A0²·X³/[(1+2X)²(1-X)] = 0.2
+   con (1+2X)²(1-X) = 1+3X-4X³:   (0.23761 + 0.8)·X³ - 0.6·X - 0.2 = 0
+   =>  1.0376·X³ - 0.6·X - 0.2 = 0
+   raíces: 0.89135,  -0.44567+0.13275i,  -0.44567-0.13275i
+   -> se descartan las dos raíces complejas; la única física (0 <= X <= 1) es X_Ae.
+   (equivalente Método A: Pi y^nu = K_C/C_T0² = 0.2/0.24372² = 3.36692 = 4X³/[(1+2X)²(1-X)])
+
+5) RESULTADOS
+   b) X_Ae = 0.89135
+   c) X = 0.70·X_Ae = 0.62394
+  | Especie | F_i (mol/s) | y_i     | C_i (mol/dm³) |
+  |---------|-------------|---------|---------------|
+  | A       | 45.826      | 0.16729 | 0.040773      |
+  | R       | 76.034      | 0.27757 | 0.06765       |
+  | S       | 152.07      | 0.55514 | 0.1353        |
+  | TOTAL   | 273.93      | 1       | 0.24372       |
+   v = v0(1+2X) = 500·(1+2·0.6239) = 1123.9 dm³/s
+
+6) COMPROBACIÓN
+   K_C recalculada en X_Ae: 0.200000  (objetivo 0.2)
+   C_T = F_T/v = 0.24372 = P/(RT) = 0.24372 mol/dm³ (constante) ✓
+   suma y_i = 1.000000 ✓;   fragmentos: Rm 121.86 -> 121.86, Sm 243.72 -> 243.72 ✓
+
+7) SELFCHECK (Método A, 20 arranques aleatorios)
+
+  --------------------------------------------------------------
+  AUTOVALIDACIÓN (selfcheck.validate) — P1 parcial, T = 500 K
+  --------------------------------------------------------------
+  Sanidad de la entrada:
+    [PASS]  1. balance de elementos (Rm, Sm): R1..R1 balanceadas
+    [PASS]  2. todas las especies participan en alguna reacción
+    [PASS]  3. número de K (1) == número de reacciones (1)
+    [info]  4. delta_j:  R1: +2
+               n_T = 121.86 + 2·xi_1
+    [info]  5. K1 = y_R y_S^2 / (y_A) * (P/P0)^2
+  Calidad de la solución:
+    [PASS]  6. residuos |K_calc-K|/K: [0.0e+00]  (máx = 0.0e+00 < 0.0001)
+    [PASS]  7. átomos in vs out: máx |Δ| = 0.0e+00 mol  (Rm: 121.86 -> 121.86, Sm: 243.72 -> 243.72)
+               n_i >= 0: mín n_i = 1.32e+01 mol
+               sum y_i = 1.000000000000
+    [PASS]  8. robustez: 20 arranques aleatorios factibles convergen al mismo xi (dispersión máx = 4.3e-14 < 1e-6, 20 intentos)
+    [PASS]  9. contraste Método B (limitante A): X_e(B) = 0.891348 vs X(A) = 0.891348;  máx |y_A - y_B| = 2.1e-17
+    [PASS] 10. ningún avance en su límite físico (todas las holguras > 1e-6 mol)
+  Plausibilidad física:
+    [n/a ] 11. Le Chatelier: requiere el barrido de T completo — llama validate_sweep(casos, xi_por_T) al final
+    [info] 12. P = P0 = 1 atm -> factor (P/P0)^delta_j = 1 en todas las reacciones
+  Veredicto: PASS  (8 PASS, 0 WARN, 0 FAIL)
+   Métodos A y B coinciden: X(A) = 0.89135 vs X_Ae(B) = 0.89135  (dif = 0.0e+00)
+
+   CSV: /Users/jpcg/Library/Mobile Documents/com~apple~CloudDocs/IBERO/EQ. Químico/chemical_equilibrium/entrega_parcial1/resultados_P1.csv
+
+════════════════════════════════════════════════════════════════════
+$ python3 entrega_parcial1/parcial1_p2.py
+════════════════════════════════════════════════════════════════════
+======================================================================
+  PARCIAL 1 — P2: acetaldehído por oxidación de etileno
+======================================================================
+
+1) ENUNCIADO Y SUPUESTOS
+   Fase gas, 1 bar. Alimentación: 1.5 mol C2H4 + 3 mol O2.
+   Salida MEDIDA: 0.78 mol CH3CHO y 0.35 mol H2O -> NO es
+   equilibrio: los avances se despejan de las mediciones.
+   R1: C2H4 + 1/2 O2 = C2H4O   (balanceada; en el examen viene esquelética)
+   R2: C2H4 + 3 O2 = 2 CO2 + 2 H2O   (balanceada; en el examen viene esquelética)
+
+2) TABLA DE AVANCES (n_i = n_i0 + sum nu_ij·xi_j)
+  | Especie | n_i0 (mol) | n_i(xi1, xi2)       |
+  |---------|------------|---------------------|
+  | C2H4    | 1.5        | 1.5 - xi1 - xi2     |
+  | O2      | 3          | 3 - 0.5·xi1 - 3·xi2 |
+  | C2H4O   | 0          | 0 + xi1             |
+  | CO2     | 0          | 0 + 2·xi2           |
+  | H2O     | 0          | 0 + 2·xi2           |
+   n_T = 4.5 - 0.5·xi1   (delta_1 = -1/2, delta_2 = 0)
+
+3) PARÁMETROS
+   nu (filas R1, R2; columnas C2H4, O2, C2H4O, CO2, H2O):
+     R1: [-1.0, -0.5, 1.0, 0.0, 0.0]
+     R2: [-1.0, -3.0, 0.0, 2.0, 2.0]
+   n_i0 = {'C2H4': 1.5, 'O2': 3.0} (resto 0)
+
+4) SISTEMA A RESOLVER (números sustituidos, lineal)
+   n_C2H4O = xi1        = 0.78  ->  xi1 = 0.78 mol
+   n_H2O   = 2·xi2      = 0.35  ->  xi2 = 0.35/2 = 0.175 mol
+
+5) RESULTADOS
+   xi1 = 0.780 mol,  xi2 = 0.175 mol,  n_T = 4.5 - 0.5·0.78 = 4.1100 mol
+  | Especie | n_i (mol) | y_i      |
+  |---------|-----------|----------|
+  | C2H4    | 0.545     | 0.1326   |
+  | O2      | 2.085     | 0.5073   |
+  | C2H4O   | 0.78      | 0.18978  |
+  | CO2     | 0.35      | 0.085158 |
+  | H2O     | 0.35      | 0.085158 |
+   b) X_C2H4 = (1.5 - 0.545)/1.5 = 0.6367
+   c) y_O2 = 2.085/4.11 = 0.5073
+   d) Rendimiento al deseado = n_C2H4O/(n_C2H4,0·1) = 0.78/1.5 = 0.5200
+      (definición del curso: mol deseado / mol que se formaría si TODO el limitante fuera a R1)
+   e) Selectividad global = deseado/no-deseado = 0.78/(0.35+0.35) = 1.1143
+      vs CO2: 0.78/0.35 = 2.2286      vs H2O: 0.78/0.35 = 2.2286
+      (otra convención vista en clase: respecto a TODOS los productos = 0.78/1.48 = 0.5270 — indica cuál usas)
+
+6) COMPROBACIÓN
+   átomos in -> out:  C: 3.00 -> 3.00,  H: 6.00 -> 6.00,  O: 6.00 -> 6.00
+   suma y_i = 1.000000;   mín n_i = 0.350 mol >= 0
+
+7) SELFCHECK (adaptado: sin K, no es equilibrio)
+    [PASS]  1. reacciones balanceadas por el parser (C, H, O)
+    [PASS]  7. átomos in vs out: máx |Δ| = 0.0e+00 mol
+    [PASS]  7. n_i >= 0 (mín = 0.350 mol)
+    [n/a ]  6. residuos de K: no aplica (avances medidos, no equilibrio)
+  Veredicto: PASS  (3 PASS, 0 WARN, 0 FAIL)
+
+   CSV: /Users/jpcg/Library/Mobile Documents/com~apple~CloudDocs/IBERO/EQ. Químico/chemical_equilibrium/entrega_parcial1/resultados_P2.csv
+
+════════════════════════════════════════════════════════════════════
+$ python3 entrega_parcial1/parcial1_p3.py
+════════════════════════════════════════════════════════════════════
+======================================================================
+  PARCIAL 1 — P3: reformado de metano, 1 CH4 + 1 H2O, 700/1000 K
+======================================================================
+
+1) ENUNCIADO Y SUPUESTOS
+   Gas ideal; P = 1 bar (supuesta, = P° de las K); H2O = VAPOR
+   (Tabla C.4, gas ideal). K(T) con la ec. 13.18 de SVA.
+   R1: CH4 + H2O = CO + 3 H2   (delta_1 = +2)
+   R2: CO + H2O = CO2 + H2   (delta_2 = +0)
+
+2) TABLA DE AVANCES (n_i = n_i0 + sum nu_ij·xi_j)
+  | Especie | n_i0 (mol) | n_i(xi1, xi2) |
+  |---------|------------|---------------|
+  | CH4     | 1          | 1 - xi1       |
+  | H2O     | 1          | 1 - xi1 - xi2 |
+  | CO      | 0          | xi1 - xi2     |
+  | H2      | 0          | 3·xi1 + xi2   |
+  | CO2     | 0          | xi2           |
+   n_T = 2 + 2·xi1
+
+3) PARÁMETROS (Tablas C.4/C.1 vía ec. 13.18)
+   R1: dH°298 = +205813 J/mol   dG°298 = +141863 J/mol   K298 = 1.397e-25
+   R2: dH°298 = -41166 J/mol   dG°298 = -28618 J/mol   K298 = 1.033e+05
+
+4) ECUACIONES A RESOLVER (números sustituidos; P = P° -> factor 1)
+   T = 700 K:
+     y_CO·y_H2³/(y_CH4·y_H2O)·(P/P°)² = K1 = 2.6849e-04
+     y_H2·y_CO2/(y_H2O·y_CO)          = K2 = 9.5163
+   T = 1000 K:
+     y_CO·y_H2³/(y_CH4·y_H2O)·(P/P°)² = K1 = 2.5813e+01
+     y_H2·y_CO2/(y_H2O·y_CO)          = K2 = 1.4612
+
+5) RESULTADOS
+   T = 700 K:  xi1 = 0.12377  xi2 = 0.11596  n_T = 2.2475 mol   X_CH4 = 0.1238
+  | Especie | n_i (mol) | y_i       |
+  |---------|-----------|-----------|
+  | CH4     | 0.87623   | 0.38986   |
+  | H2O     | 0.76027   | 0.33827   |
+  | CO      | 0.0078097 | 0.0034748 |
+  | H2      | 0.48727   | 0.2168    |
+  | CO2     | 0.11596   | 0.051594  |
+   T = 1000 K:  xi1 = 0.78780  xi2 = 0.06437  n_T = 3.5756 mol   X_CH4 = 0.7878
+  | Especie | n_i (mol) | y_i      |
+  |---------|-----------|----------|
+  | CH4     | 0.2122    | 0.059345 |
+  | H2O     | 0.14783   | 0.041344 |
+  | CO      | 0.72344   | 0.20233  |
+  | H2      | 2.4278    | 0.67898  |
+  | CO2     | 0.064367  | 0.018002 |
+
+6) COMPROBACIÓN
+   T = 700 K: |K_calc-K|/K máx = 3.7e-16;  átomos máx |Δ| = 8.9e-16 mol;  sum y_i = 1.000000
+   T = 1000 K: |K_calc-K|/K máx = 1.5e-16;  átomos máx |Δ| = 0.0e+00 mol;  sum y_i = 1.000000
+
+7) SELFCHECK (20 arranques aleatorios por T + Le Chatelier)
+
+  --------------------------------------------------------------
+  AUTOVALIDACIÓN (selfcheck.validate) — P3 parcial, T = 700 K
+  --------------------------------------------------------------
+  Sanidad de la entrada:
+    [PASS]  1. balance de elementos (C, H, O): R1..R2 balanceadas
+    [PASS]  2. todas las especies participan en alguna reacción
+    [PASS]  3. número de K (2) == número de reacciones (2)
+    [info]  4. delta_j:  R1: +2,  R2: +0
+               n_T = 2 + 2·xi_1
+    [info]  5. K1 = y_CO y_H2^3 / (y_CH4 y_H2O) * (P/P0)^2
+               K2 = y_H2 y_CO2 / (y_H2O y_CO)
+  Calidad de la solución:
+    [PASS]  6. residuos |K_calc-K|/K: [0.0e+00, 3.7e-16]  (máx = 3.7e-16 < 0.0001)
+    [PASS]  7. átomos in vs out: máx |Δ| = 8.9e-16 mol  (C: 1 -> 1, H: 6 -> 6, O: 1 -> 1)
+               n_i >= 0: mín n_i = 7.81e-03 mol
+               sum y_i = 1.000000000000
+    [PASS]  8. robustez: 20 arranques aleatorios factibles convergen al mismo xi (dispersión máx = 2.8e-17 < 1e-6, 20 intentos)
+    [n/a ]  9. contraste Método B: solo aplica a problemas de 1 reacción (aquí hay 2)
+    [PASS] 10. ningún avance en su límite físico (todas las holguras > 1e-6 mol)
+  Plausibilidad física:
+    [n/a ] 11. Le Chatelier: requiere el barrido de T completo — llama validate_sweep(casos, xi_por_T) al final
+    [info] 12. P = P0 = 1 bar -> factor (P/P0)^delta_j = 1 en todas las reacciones
+  Veredicto: PASS  (7 PASS, 0 WARN, 0 FAIL)
+
+  --------------------------------------------------------------
+  AUTOVALIDACIÓN (selfcheck.validate) — P3 parcial, T = 1000 K
+  --------------------------------------------------------------
+  Sanidad de la entrada:
+    [PASS]  1. balance de elementos (C, H, O): R1..R2 balanceadas
+    [PASS]  2. todas las especies participan en alguna reacción
+    [PASS]  3. número de K (2) == número de reacciones (2)
+    [info]  4. delta_j:  R1: +2,  R2: +0
+               n_T = 2 + 2·xi_1
+    [info]  5. K1 = y_CO y_H2^3 / (y_CH4 y_H2O) * (P/P0)^2
+               K2 = y_H2 y_CO2 / (y_H2O y_CO)
+  Calidad de la solución:
+    [PASS]  6. residuos |K_calc-K|/K: [0.0e+00, 1.5e-16]  (máx = 1.5e-16 < 0.0001)
+    [PASS]  7. átomos in vs out: máx |Δ| = 0.0e+00 mol  (C: 1 -> 1, H: 6 -> 6, O: 1 -> 1)
+               n_i >= 0: mín n_i = 6.44e-02 mol
+               sum y_i = 1.000000000000
+    [PASS]  8. robustez: 20 arranques aleatorios factibles convergen al mismo xi (dispersión máx = 1.1e-16 < 1e-6, 20 intentos)
+    [n/a ]  9. contraste Método B: solo aplica a problemas de 1 reacción (aquí hay 2)
+    [PASS] 10. ningún avance en su límite físico (todas las holguras > 1e-6 mol)
+  Plausibilidad física:
+    [n/a ] 11. Le Chatelier: requiere el barrido de T completo — llama validate_sweep(casos, xi_por_T) al final
+    [info] 12. P = P0 = 1 bar -> factor (P/P0)^delta_j = 1 en todas las reacciones
+  Veredicto: PASS  (7 PASS, 0 WARN, 0 FAIL)
+
+  --------------------------------------------------------------
+  AUTOVALIDACIÓN (selfcheck.validate_sweep) — Le Chatelier
+  --------------------------------------------------------------
+  Temperaturas: 700 K, 1000 K
+    [PASS] 11. R1:  K : 2.6849e-04 -> 2.5813e+01   (creciente)
+                    xi: 0.12377 -> 0.78780   (creciente)
+               coherente con Le Chatelier (K y xi en la misma dirección)
+    [PASS] 11. R2:  K : 9.5163e+00 -> 1.4612e+00   (decreciente)
+                    xi: 0.11596 -> 0.06437   (decreciente)
+               coherente con Le Chatelier (K y xi en la misma dirección)
+  Veredicto: PASS  (2 PASS, 0 WARN, 0 FAIL)
+
+8) TABLA TERMODINÁMICA POR REACCIÓN
+  | T (K) | Rxn | dCp/R  | dH° (kJ/mol) | dG° (kJ/mol) | K          |
+  |-------|-----|--------|--------------|--------------|------------|
+  | 700   | R1  | 2.9356 | 219.91       | 47.854       | 0.00026849 |
+  | 700   | R2  | 1.2444 | -37.716      | -13.112      | 9.5163     |
+  | 1000  | R1  | 1.4167 | 225.26       | -27.028      | 25.813     |
+  | 1000  | R2  | 1.2036 | -34.636      | -3.1532      | 1.4612     |
+
+9) TRAYECTORIA DE NEWTON desde (xi1, xi2) = (0.1, 0.01)
+   (forma logarítmica de las MISMAS ecuaciones: r_j = ln(Pi y^nu_j) - ln K_j; Jacobiano por diferencias finitas; paso amortiguado para mantener n_i > 0)
+
+   T = 700 K:
+      it        xi1        xi2     max|r|  paso lam
+       0   0.100000   0.010000   5.50e+00    1.0000
+       1   0.077036   0.057616   2.26e+00    1.0000
+       2   0.109422   0.106030   1.20e+00    1.0000
+       3   0.122511   0.116276   2.47e-01    1.0000
+       4   0.123697   0.116054   2.23e-02    1.0000
+       5   0.123768   0.115960   2.30e-04    1.0000
+       6   0.123769   0.115959   2.49e-08    1.0000
+       7   0.123769   0.115959   3.55e-15    1.0000
+     -> coincide con el solver multi-arranque (dif máx = 1.4e-17)
+
+   T = 1000 K:
+      it        xi1        xi2     max|r|  paso lam
+       0   0.100000   0.010000   1.05e+01    1.0000
+       1   0.359797   0.042147   5.09e+00    1.0000
+       2   0.749515   0.086411   4.31e-01    1.0000
+       3   0.789544   0.062263   3.97e-02    1.0000
+       4   0.787817   0.064342   5.29e-04    1.0000
+       5   0.787805   0.064367   7.21e-08    1.0000
+       6   0.787805   0.064367   2.00e-15    1.0000
+     -> coincide con el solver multi-arranque (dif máx = 1.2e-16)
+
+   CSV: /Users/jpcg/Library/Mobile Documents/com~apple~CloudDocs/IBERO/EQ. Químico/chemical_equilibrium/entrega_parcial1/resultados_P3.csv
+   Gráfica: /Users/jpcg/Library/Mobile Documents/com~apple~CloudDocs/IBERO/EQ. Químico/chemical_equilibrium/entrega_parcial1/grafica_P3.png

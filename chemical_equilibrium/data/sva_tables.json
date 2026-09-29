@@ -1,0 +1,601 @@
+{
+  "_meta": {
+    "descripcion": "Datos tipo Tablas C.1 (Cp/R = A + B*T + C*T^2 + D*T^-2) y C.4 (Hf298, Gf298 en J/mol, gas ideal a 298.15 K) de Smith-Van Ness 7a ed. B, C, D ya multiplicados por sus factores de encabezado (10^-3, 10^-6, 10^5).",
+    "estado": "VERIFICADO contra el libro (Smith Van Ness .pdf, 7a ed., Tablas C.1 p.684 y C.4 pp.686-687): doble pase visual + cotejo automático de la capa de texto, 0 discrepancias. Incluye TODAS las especies gaseosas de C.1 que tienen Hf/Gf en C.4 (o son elementos en estado estándar). Claves especiales: iC4H10 (iso-butano), cC6H12 (ciclohexano), C2H4Oox (óxido de etileno); C2H4O = acetaldehído.",
+    "unidades": {
+      "Hf298": "J/mol",
+      "Gf298": "J/mol",
+      "Cp": "adimensional (Cp/R)",
+      "Tmax": "K"
+    },
+    "fecha_verificacion": "2026-09-22"
+  },
+  "CH4": {
+    "nombre": "metano",
+    "fase": "g",
+    "Hf298": -74520,
+    "Gf298": -50460,
+    "Cp": {
+      "A": 1.702,
+      "B": 0.009081,
+      "C": -2.164e-06,
+      "D": 0.0,
+      "Tmax": 1500
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "C2H6": {
+    "nombre": "etano",
+    "fase": "g",
+    "Hf298": -83820,
+    "Gf298": -31855,
+    "Cp": {
+      "A": 1.131,
+      "B": 0.019225,
+      "C": -5.561e-06,
+      "D": 0.0,
+      "Tmax": 1500
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "C3H8": {
+    "nombre": "propano",
+    "fase": "g",
+    "Hf298": -104680,
+    "Gf298": -24290,
+    "Cp": {
+      "A": 1.213,
+      "B": 0.028785,
+      "C": -8.824e-06,
+      "D": 0.0,
+      "Tmax": 1500
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "C4H10": {
+    "nombre": "n-butano",
+    "fase": "g",
+    "Hf298": -125790,
+    "Gf298": -16570,
+    "Cp": {
+      "A": 1.935,
+      "B": 0.036915,
+      "C": -1.1402e-05,
+      "D": 0.0,
+      "Tmax": 1500
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "C5H12": {
+    "nombre": "n-pentano",
+    "fase": "g",
+    "Hf298": -146760,
+    "Gf298": -8650,
+    "Cp": {
+      "A": 2.464,
+      "B": 0.045351,
+      "C": -1.4111e-05,
+      "D": 0.0,
+      "Tmax": 1500
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "C6H14": {
+    "nombre": "n-hexano",
+    "fase": "g",
+    "Hf298": -166920,
+    "Gf298": 150,
+    "Cp": {
+      "A": 3.025,
+      "B": 0.053722,
+      "C": -1.6791e-05,
+      "D": 0.0,
+      "Tmax": 1500
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "C7H16": {
+    "nombre": "n-heptano",
+    "fase": "g",
+    "Hf298": -187780,
+    "Gf298": 8260,
+    "Cp": {
+      "A": 3.57,
+      "B": 0.062127,
+      "C": -1.9486e-05,
+      "D": 0.0,
+      "Tmax": 1500
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "C8H18": {
+    "nombre": "n-octano",
+    "fase": "g",
+    "Hf298": -208750,
+    "Gf298": 16260,
+    "Cp": {
+      "A": 4.108,
+      "B": 0.070567,
+      "C": -2.2208e-05,
+      "D": 0.0,
+      "Tmax": 1500
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "C2H4": {
+    "nombre": "etileno",
+    "fase": "g",
+    "Hf298": 52510,
+    "Gf298": 68460,
+    "Cp": {
+      "A": 1.424,
+      "B": 0.014394,
+      "C": -4.392e-06,
+      "D": 0.0,
+      "Tmax": 1500
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "C3H6": {
+    "nombre": "propileno",
+    "fase": "g",
+    "Hf298": 19710,
+    "Gf298": 62205,
+    "Cp": {
+      "A": 1.637,
+      "B": 0.022706,
+      "C": -6.915e-06,
+      "D": 0.0,
+      "Tmax": 1500
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "C4H8": {
+    "nombre": "1-buteno",
+    "fase": "g",
+    "Hf298": -540,
+    "Gf298": 70340,
+    "Cp": {
+      "A": 1.967,
+      "B": 0.03163,
+      "C": -9.873e-06,
+      "D": 0.0,
+      "Tmax": 1500
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "C5H10": {
+    "nombre": "1-penteno",
+    "fase": "g",
+    "Hf298": -21280,
+    "Gf298": 78410,
+    "Cp": {
+      "A": 2.691,
+      "B": 0.039753,
+      "C": -1.2447e-05,
+      "D": 0.0,
+      "Tmax": 1500
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "C6H12": {
+    "nombre": "1-hexeno",
+    "fase": "g",
+    "Hf298": -41950,
+    "Gf298": 86830,
+    "Cp": {
+      "A": 3.22,
+      "B": 0.048189,
+      "C": -1.5157e-05,
+      "D": 0.0,
+      "Tmax": 1500
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "C2H4O": {
+    "nombre": "acetaldehído",
+    "fase": "g",
+    "Hf298": -166190,
+    "Gf298": -128860,
+    "Cp": {
+      "A": 1.693,
+      "B": 0.017978,
+      "C": -6.158e-06,
+      "D": 0.0,
+      "Tmax": 1000
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "C2H2": {
+    "nombre": "acetileno",
+    "fase": "g",
+    "Hf298": 227480,
+    "Gf298": 209970,
+    "Cp": {
+      "A": 6.132,
+      "B": 0.001952,
+      "C": 0.0,
+      "D": -129900.0,
+      "Tmax": 1500
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "C6H6": {
+    "nombre": "benceno",
+    "fase": "g",
+    "Hf298": 82930,
+    "Gf298": 129665,
+    "Cp": {
+      "A": -0.206,
+      "B": 0.039064,
+      "C": -1.3301e-05,
+      "D": 0.0,
+      "Tmax": 1500
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "C4H6": {
+    "nombre": "1,3-butadieno",
+    "fase": "g",
+    "Hf298": 109240,
+    "Gf298": 149795,
+    "Cp": {
+      "A": 2.734,
+      "B": 0.026786,
+      "C": -8.882e-06,
+      "D": 0.0,
+      "Tmax": 1500
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "cC6H12": {
+    "nombre": "ciclohexano",
+    "fase": "g",
+    "Hf298": -123140,
+    "Gf298": 31920,
+    "Cp": {
+      "A": -3.876,
+      "B": 0.063249,
+      "C": -2.0928e-05,
+      "D": 0.0,
+      "Tmax": 1500
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "C2H6O": {
+    "nombre": "etanol",
+    "fase": "g",
+    "Hf298": -235100,
+    "Gf298": -168490,
+    "Cp": {
+      "A": 3.518,
+      "B": 0.020001,
+      "C": -6.002e-06,
+      "D": 0.0,
+      "Tmax": 1500
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "C8H10": {
+    "nombre": "etilbenceno",
+    "fase": "g",
+    "Hf298": 29920,
+    "Gf298": 130890,
+    "Cp": {
+      "A": 1.124,
+      "B": 0.05538,
+      "C": -1.8476e-05,
+      "D": 0.0,
+      "Tmax": 1500
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "C2H4Oox": {
+    "nombre": "óxido de etileno",
+    "fase": "g",
+    "Hf298": -52630,
+    "Gf298": -13010,
+    "Cp": {
+      "A": -0.385,
+      "B": 0.023463,
+      "C": -9.296e-06,
+      "D": 0.0,
+      "Tmax": 1000
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "CH2O": {
+    "nombre": "formaldehído",
+    "fase": "g",
+    "Hf298": -108570,
+    "Gf298": -102530,
+    "Cp": {
+      "A": 2.264,
+      "B": 0.007022,
+      "C": -1.877e-06,
+      "D": 0.0,
+      "Tmax": 1500
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "CH4O": {
+    "nombre": "metanol",
+    "fase": "g",
+    "Hf298": -200660,
+    "Gf298": -161960,
+    "Cp": {
+      "A": 2.211,
+      "B": 0.012216,
+      "C": -3.45e-06,
+      "D": 0.0,
+      "Tmax": 1500
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "C8H8": {
+    "nombre": "estireno",
+    "fase": "g",
+    "Hf298": 147360,
+    "Gf298": 213900,
+    "Cp": {
+      "A": 2.05,
+      "B": 0.050192,
+      "C": -1.6662e-05,
+      "D": 0.0,
+      "Tmax": 1500
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "C7H8": {
+    "nombre": "tolueno",
+    "fase": "g",
+    "Hf298": 50170,
+    "Gf298": 122050,
+    "Cp": {
+      "A": 0.29,
+      "B": 0.047052,
+      "C": -1.5716e-05,
+      "D": 0.0,
+      "Tmax": 1500
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "NH3": {
+    "nombre": "amoniaco",
+    "fase": "g",
+    "Hf298": -46110,
+    "Gf298": -16450,
+    "Cp": {
+      "A": 3.578,
+      "B": 0.00302,
+      "C": 0.0,
+      "D": -18600.0,
+      "Tmax": 1800
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "CO": {
+    "nombre": "monóxido de carbono",
+    "fase": "g",
+    "Hf298": -110525,
+    "Gf298": -137169,
+    "Cp": {
+      "A": 3.376,
+      "B": 0.000557,
+      "C": 0.0,
+      "D": -3100.0,
+      "Tmax": 2500
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "CO2": {
+    "nombre": "dióxido de carbono",
+    "fase": "g",
+    "Hf298": -393509,
+    "Gf298": -394359,
+    "Cp": {
+      "A": 5.457,
+      "B": 0.001045,
+      "C": 0.0,
+      "D": -115700.0,
+      "Tmax": 2000
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "Cl2": {
+    "nombre": "cloro",
+    "fase": "g",
+    "Hf298": 0,
+    "Gf298": 0,
+    "Cp": {
+      "A": 4.442,
+      "B": 8.9e-05,
+      "C": 0.0,
+      "D": -34400.0,
+      "Tmax": 3000
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "H2": {
+    "nombre": "hidrógeno",
+    "fase": "g",
+    "Hf298": 0,
+    "Gf298": 0,
+    "Cp": {
+      "A": 3.249,
+      "B": 0.000422,
+      "C": 0.0,
+      "D": 8300.0,
+      "Tmax": 3000
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "H2S": {
+    "nombre": "sulfuro de hidrógeno",
+    "fase": "g",
+    "Hf298": -20630,
+    "Gf298": -33560,
+    "Cp": {
+      "A": 3.931,
+      "B": 0.00149,
+      "C": 0.0,
+      "D": -23200.0,
+      "Tmax": 2300
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "HCl": {
+    "nombre": "cloruro de hidrógeno",
+    "fase": "g",
+    "Hf298": -92307,
+    "Gf298": -95299,
+    "Cp": {
+      "A": 3.156,
+      "B": 0.000623,
+      "C": 0.0,
+      "D": 15100.0,
+      "Tmax": 2000
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "HCN": {
+    "nombre": "cianuro de hidrógeno",
+    "fase": "g",
+    "Hf298": 135100,
+    "Gf298": 124700,
+    "Cp": {
+      "A": 4.736,
+      "B": 0.001359,
+      "C": 0.0,
+      "D": -72500.0,
+      "Tmax": 2500
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "N2": {
+    "nombre": "nitrógeno",
+    "fase": "g",
+    "Hf298": 0,
+    "Gf298": 0,
+    "Cp": {
+      "A": 3.28,
+      "B": 0.000593,
+      "C": 0.0,
+      "D": 4000.0,
+      "Tmax": 2000
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "N2O": {
+    "nombre": "óxido nitroso",
+    "fase": "g",
+    "Hf298": 82050,
+    "Gf298": 104200,
+    "Cp": {
+      "A": 5.328,
+      "B": 0.001214,
+      "C": 0.0,
+      "D": -92800.0,
+      "Tmax": 2000
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "NO": {
+    "nombre": "óxido nítrico",
+    "fase": "g",
+    "Hf298": 90250,
+    "Gf298": 86550,
+    "Cp": {
+      "A": 3.387,
+      "B": 0.000629,
+      "C": 0.0,
+      "D": 1400.0,
+      "Tmax": 2000
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "NO2": {
+    "nombre": "dióxido de nitrógeno",
+    "fase": "g",
+    "Hf298": 33180,
+    "Gf298": 51310,
+    "Cp": {
+      "A": 4.982,
+      "B": 0.001195,
+      "C": 0.0,
+      "D": -79200.0,
+      "Tmax": 2000
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "N2O4": {
+    "nombre": "tetraóxido de dinitrógeno",
+    "fase": "g",
+    "Hf298": 9160,
+    "Gf298": 97540,
+    "Cp": {
+      "A": 11.66,
+      "B": 0.002257,
+      "C": 0.0,
+      "D": -278700.0,
+      "Tmax": 2000
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "O2": {
+    "nombre": "oxígeno",
+    "fase": "g",
+    "Hf298": 0,
+    "Gf298": 0,
+    "Cp": {
+      "A": 3.639,
+      "B": 0.000506,
+      "C": 0.0,
+      "D": -22700.0,
+      "Tmax": 2000
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "SO2": {
+    "nombre": "dióxido de azufre",
+    "fase": "g",
+    "Hf298": -296830,
+    "Gf298": -300194,
+    "Cp": {
+      "A": 5.699,
+      "B": 0.000801,
+      "C": 0.0,
+      "D": -101499.99999999999,
+      "Tmax": 2000
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "SO3": {
+    "nombre": "trióxido de azufre",
+    "fase": "g",
+    "Hf298": -395720,
+    "Gf298": -371060,
+    "Cp": {
+      "A": 8.06,
+      "B": 0.001056,
+      "C": 0.0,
+      "D": -202800.0,
+      "Tmax": 2000
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  },
+  "H2O": {
+    "nombre": "agua",
+    "fase": "g",
+    "Hf298": -241818,
+    "Gf298": -228572,
+    "Cp": {
+      "A": 3.47,
+      "B": 0.00145,
+      "C": 0.0,
+      "D": 12100.0,
+      "Tmax": 2000
+    },
+    "verificado": "libro (Tablas C.1/C.4 7a ed., doble pase 2026-09-22)"
+  }
+}

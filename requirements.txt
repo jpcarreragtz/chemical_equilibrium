@@ -1,0 +1,8 @@
+# Dependencias del solver (chemical_equilibrium/) — según imports reales
+numpy>=1.24
+scipy>=1.10          # least_squares (Método A) y brentq (Método B)
+matplotlib>=3.7      # gráficas y_i vs T de exercise.py / plantillas
+
+# Opcional (solo cosmético): tablas más bonitas en consola;
+# equilibrium.format_table tiene fallback en texto plano si falta.
+# tabulate

@@ -42,11 +42,15 @@ casos = {
 P = 1.0   # bar
 
 # H2 máximo teórico: R1+R2 completas equivalen a C3H8 + 6 H2O -> 3 CO2 + 10 H2,
-# o sea 10 mol H2 por mol de C3H8; pero esa ruta pide 6 mol H2O por mol de
-# propano y solo se alimentan 4, así que el agua limita a (10/6)*4 = 6.667 mol.
+# o sea 10 mol H2 por mol de C3H8, pero esa ruta pide 6 mol H2O y solo hay 4.
+# El máximo REAL de la alimentación es el límite elemental de hidrógeno:
+# (8·n_C3H8 + 2·n_H2O)/2 = 8 mol, que se alcanza con R1 completa + WGS del
+# agua sobrante (propano y agua se agotan a la vez). OJO: NO es (10/6)*4 =
+# 6.667 — eso reparte el agua proporcionalmente entre R1 y R2, pero el
+# reformado rinde 7/3 H2 por H2O y la WGS solo 1.
 n_A0 = n0["C3H8"]
 H2_MAX_PROPANO = 10.0 * n_A0
-H2_MAX_AGUA = 10.0 / 6.0 * n0["H2O"]
+H2_MAX_AGUA = (8.0 * n_A0 + 2.0 * n0["H2O"]) / 2.0
 
 # ---------- Resolver para cada T ----------
 resultados = {}   # T -> ExtentResult, para las tablas comparativas del final
@@ -67,8 +71,8 @@ for T, K in casos.items():
 print(f"\n{'='*50}\n  RESULTADOS DEL EJERCICIO\n{'='*50}")
 print(f"  H2 máximo teórico: {H2_MAX_PROPANO:g} mol (10 por mol de C3H8, "
       f"R1+R2 completas)")
-print(f"  H2 máximo por el agua alimentada: {H2_MAX_AGUA:.4g} mol "
-      f"(= 10/6 * 4 mol H2O)")
+print(f"  H2 máximo por la alimentación: {H2_MAX_AGUA:.4g} mol "
+      f"(límite elemental de H: (8*1 + 2*4)/2)")
 
 filas = []
 for T, res in sorted(resultados.items()):

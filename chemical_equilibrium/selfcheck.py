@@ -321,9 +321,13 @@ def _check_method_b(rep: Report, problem: Problem, result: ExtentResult,
 # validate — el reporte completo (puntos 1-10 y 12; el 11 vive en el barrido)
 # ----------------------------------------------------------------------------
 
-def validate(problem: Problem, result: ExtentResult) -> Report:
+def validate(problem: Problem, result: ExtentResult,
+             n_starts: int = 5, k_tol: float = 1e-6) -> Report:
     """Corre TODAS las comprobaciones sobre un resultado de solve_extents y
-    imprime el reporte numerado. Devuelve el Report (report.ok = sin FAIL)."""
+    imprime el reporte numerado. Devuelve el Report (report.ok = sin FAIL).
+
+    n_starts: arranques aleatorios del punto 8 (robustez).
+    k_tol   : tolerancia relativa |K_calc-K|/K del punto 6."""
     nu = np.atleast_2d(np.asarray(problem.nu, dtype=float))
     n_rxn, n_sp = nu.shape
     rep = Report()
@@ -431,11 +435,11 @@ def validate(problem: Problem, result: ExtentResult) -> Report:
     rel = np.abs(result.K_calc - result.K_given) / result.K_given
     txt6 = ("residuos |K_calc-K|/K: ["
             + ", ".join(f"{r:.1e}" for r in rel)
-            + f"]  (máx = {rel.max():.1e} < 1e-6)")
-    if result.converged and rel.max() < 1e-6:
+            + f"]  (máx = {rel.max():.1e} < {k_tol:g})")
+    if result.converged and rel.max() < k_tol:
         rep.add("pass", 6, txt6)
     else:
-        lines = [txt6.replace(" < 1e-6", " — NO cumple 1e-6")]
+        lines = [txt6.replace(f" < {k_tol:g}", f" — NO cumple {k_tol:g}")]
         if not result.converged:
             lines.append(f"solver: {result.message}")
         rep.add("fail", 6, lines)
@@ -467,7 +471,8 @@ def validate(problem: Problem, result: ExtentResult) -> Report:
 
     # 8. robustez multi-arranque
     _check_robustness(rep, nu, n0_vec, problem.K, delta,
-                      problem.P, problem.P0, result.xi)
+                      problem.P, problem.P0, result.xi,
+                      n_obj=n_starts, max_try=max(25, 3 * n_starts))
 
     # 9. contraste con Método B (1 sola reacción)
     _check_method_b(rep, problem, result, nu, n0_vec)

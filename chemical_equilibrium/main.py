@@ -244,15 +244,16 @@ def test_4() -> bool:
           "as given — nothing changed.")
 
     n_A0 = n0["C3H8"]
-    # H2 ceiling per the course statement: R1+R2 to completion gives
-    # C3H8 + 6 H2O -> 3 CO2 + 10 H2, i.e. 10 mol H2 per mol C3H8 —
-    # but that route needs 6 mol H2O per mol C3H8 and this feed only has 4,
-    # so water caps H2 at (10/6)*n_H2O0.
+    # H2 ceiling: R1+R2 per mol C3H8 give 10 H2 but need 6 H2O; with only
+    # 4 H2O the TRUE feed cap is the elemental-H limit,
+    # (8*n_C3H8 + 2*n_H2O)/2 = 8 mol, reached by R1 to completion plus WGS
+    # on the leftover water. It is NOT (10/6)*4 = 6.667: that splits the
+    # water pro-rata, but reforming yields 7/3 H2 per H2O vs only 1 for WGS.
     h2_max_propane = 10.0 * n_A0
-    h2_max_water = 10.0 / 6.0 * n0["H2O"]
+    h2_max_water = (8.0 * n_A0 + 2.0 * n0["H2O"]) / 2.0
     print(f"  Theoretical max H2: {h2_max_propane:g} mol (per propane, "
-          f"R1+R2 complete) | {h2_max_water:.4g} mol (allowed by this "
-          f"feed's water)")
+          f"R1+R2 complete) | {h2_max_water:.4g} mol (elemental-H cap of "
+          f"this feed)")
 
     ok = True
     columns: Dict[float, List[float]] = {}
