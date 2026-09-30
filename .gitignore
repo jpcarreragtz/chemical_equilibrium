@@ -19,6 +19,7 @@ Tablas SVA/
 
 # Editor
 .vscode/
+chemical_equilibrium/notebooks/.ipynb_checkpoints/
 
 # Salidas regenerables del solver (las entregas congeladas SÍ se versionan:
 # chemical_equilibrium/examenes/.../entrega_parcial1/ y ejercicios/entrega_s15/)

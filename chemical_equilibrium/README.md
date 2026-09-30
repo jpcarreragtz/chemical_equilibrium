@@ -26,6 +26,7 @@ chemical_equilibrium/
 ├── plantilla/
 │   └── plantilla_ejercicio.py   # copia esto para cada ejercicio nuevo
 ├── ejercicios/                  # tareas/clase: ej2, sesión 9, sesión 15, ...
+├── notebooks/                   # estudio (00_teoria) y versión-reporte (ej2_reporte); NO canónicos
 │   └── entrega_s15/             # entregable de la sesión 15
 ├── examenes/
 │   ├── parcial1_otono2026/      # parcial1_p1/p2/p3.py (ejecutables)
@@ -70,6 +71,17 @@ canónica y la que valida selfcheck: su salida es exactamente la misma que
 antes de dividir el archivo en celdas. Si al correr una celda falla el
 `sys.path`, revisa que el directorio de trabajo del kernel sea la carpeta
 del script (ajuste `jupyter.notebookFileRoot`, por omisión `${fileDirname}`).
+
+## Notebooks (`notebooks/`)
+
+Los `.py` de `ejercicios/` son la versión canónica y validada; los notebooks
+son para estudiar y para versión-reporte. `00_teoria.ipynb` explica ec.
+13.18, Cp(T), Van't Hoff y el sistema en ξ con ejemplos calculados por
+`core.thermo` (K_WGS(1100 K) ≈ 1.006, K_NH3(298 K) ≈ 762, K_NH3(500 K) ≈
+0.316); `ej2_reporte.ipynb` importa el solver desde `core`, agrega la
+derivación, tablas y gráfica, y termina en selfcheck (mismos números que
+`ejercicios/ej2_mio.py`). Se regeneran con
+`cd notebooks && jupyter nbconvert --to notebook --execute --inplace *.ipynb`.
 
 ## Cómo correr los tests
 
