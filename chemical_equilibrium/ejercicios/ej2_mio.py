@@ -22,12 +22,49 @@ Rendimientos de H2:
     Y_H2 (alimentación) = n_H2 / 8    (máximo con 4 mol H2O disponibles)
 """
 
+# %% Setup — shim de sys.path e imports
 import sys, pathlib
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))  # raíz del proyecto
+try:
+    _RAIZ = pathlib.Path(__file__).resolve().parents[1]          # raíz del proyecto
+except NameError:                                                # celda/notebook sin __file__
+    _RAIZ = next((p for p in [pathlib.Path.cwd(), *pathlib.Path.cwd().parents]
+                  if (p / "core" / "exercise.py").exists()), None)
+    if _RAIZ is None:
+        raise RuntimeError("no encuentro core/ desde el cwd: corre el kernel "
+                           "con la carpeta del script como directorio de trabajo")
+sys.path.insert(0, str(_RAIZ))
 
+from core import SALIDAS
 from core.equilibrium import solve_extents
 from core.selfcheck import Problem, validate, validate_sweep
 
+try:
+    import pandas as pd              # solo para las tablas inline (pip3 install pandas)
+except ImportError:                  # sin pandas el script corre igual; las
+    pd = None                        # celdas de tabla no muestran nada
+
+# %% [markdown]
+# ## Ejercicio 2 (sesión 6) — Reformado de propano con vapor
+#
+# Alimentación: 1 mol C₃H₈, 4 mol H₂O, 0.5 mol N₂ (inerte). P = 1 bar.
+#
+# | | Reacción | δ |
+# |---|---|---|
+# | R1 | $\mathrm{C_3H_8 + 3\,H_2O \rightleftharpoons 3\,CO + 7\,H_2}$ | +6 |
+# | R2 | $\mathrm{CO + H_2O \rightleftharpoons CO_2 + H_2}$ | 0 |
+# | R3 | $\mathrm{C_3H_8 + 2\,H_2 \rightleftharpoons 3\,CH_4}$ | 0 |
+#
+# **Balances de moles** (avances ξ₁, ξ₂, ξ₃):
+#
+# $$n_{C_3H_8} = 1 - \xi_1 - \xi_3,\quad n_{H_2O} = 4 - 3\xi_1 - \xi_2,\quad
+# n_{CO} = 3\xi_1 - \xi_2,\quad n_{H_2} = 7\xi_1 + \xi_2 - 2\xi_3,$$
+# $$n_{CO_2} = \xi_2,\quad n_{CH_4} = 3\xi_3,\quad n_{N_2} = 0.5,\quad
+# n_T = 5.5 + 6\xi_1$$
+#
+# Cada K_j se escribe como $K_j = \prod_i y_i^{\nu_{ij}} \,(P/P^\circ)^{\delta_j}$
+# y el sistema de 3 ecuaciones en ξ se resuelve con `core.equilibrium.solve_extents`.
+
+# %% Especies, alimentación y matriz estequiométrica
 # ---------- Especies (el orden define las columnas de nu) ----------
 especies = ["C3H8", "H2O", "CO", "H2", "CO2", "CH4", "N2"]
 
@@ -54,6 +91,7 @@ atomos = {
     "N2":   {"N": 2},
 }
 
+# %% K por temperatura, valores a mano y máximos de H2
 # ---------- Constantes de equilibrio por temperatura (orden K1, K2, K3) ----------
 casos = {
     700:  [7.2285e-3, 7.5034,  2.4203e10],
@@ -82,6 +120,7 @@ H2_MAX_TEORICO = 10.0   # mol H2 por mol C3H8 si R1 y R2 son completas
 H2_MAX_ALIMENTACION = 8.0
 
 
+# %% Balances de moles (función)
 def balances(xi1, xi2, xi3):
     """Balances de moles — exactamente los de mis notas."""
     n = {
@@ -97,6 +136,7 @@ def balances(xi1, xi2, xi3):
     return n, n_T
 
 
+# %% Resolver por T — a) ξ, b) n_i/y_i, c) X, d) S, e) Y_H2 + selfcheck (puntos 1-10 y 12)
 resumen = []
 xi_resueltos = {}   # xi de cada T, para la verificación final contra la clave
 for T, K in casos.items():
@@ -163,7 +203,7 @@ for T, K in casos.items():
                        label="Reformado de propano")
     validate(problema, res)
 
-# ---------- Tabla final (mismo formato que la clave de respuestas) ----------
+# %% Tabla final — conversión, selectividades y rendimiento (formato de la clave)
 print(f"\n{'='*64}\n  Conversión, selectividades y rendimiento\n{'='*64}")
 print(f"  {'T_K':>5s} {'X_C3H8':>7s} {'S_reformado':>12s} {'S_CO':>9s} {'S_CO2':>9s} "
       f"{'S_CH4':>9s} {'Y_H2':>9s} {'Y_H2_alim':>9s} {'H2_CO':>8s} {'H2_COx':>8s}")
@@ -171,7 +211,69 @@ for T, X, S_ref, S_CO, S_CO2, S_CH4, Y_H2, H2_CO, H2_COx, Y_H2_alim in resumen:
     print(f"  {T:5d} {X:7.4g} {S_ref:12.5f} {S_CO:9.5f} {S_CO2:9.5f} "
           f"{S_CH4:9.5f} {Y_H2:9.5f} {Y_H2_alim:9.5f} {H2_CO:8.4f} {H2_COx:8.4f}")
 
-# ---------- Verificación contra la clave de respuestas del profesor ----------
+# %% Tabla de resultados — ξ_j, n_i y y_i por T (DataFrame; solo se ve en el kernel)
+filas = []
+for T in casos:
+    xi1, xi2, xi3 = xi_resueltos[T]
+    n, n_T = balances(xi1, xi2, xi3)
+    fila = {"T (K)": T, "xi_1": xi1, "xi_2": xi2, "xi_3": xi3, "n_T": n_T}
+    fila.update({f"n_{sp}": n[sp] for sp in especies})
+    fila.update({f"y_{sp}": n[sp] / n_T for sp in especies})
+    filas.append(fila)
+tabla_resultados = pd.DataFrame(filas).set_index("T (K)") if pd else filas
+tabla_resultados
+
+# %% Tabla de métricas — X, selectividades, rendimientos y razones H2/CO
+columnas = ["T (K)", "X_C3H8", "S_reformado", "S_CO", "S_CO2", "S_CH4",
+            "Y_H2", "H2_CO", "H2_COx", "Y_H2_alim"]
+tabla_metricas = (pd.DataFrame(resumen, columns=columnas).set_index("T (K)")
+                  if pd else resumen)
+tabla_metricas
+
+# %% Gráfica — y_i vs T (inline en el kernel; como script solo guarda el PNG en salidas/)
+import matplotlib
+if "ipykernel" not in sys.modules:      # script: backend sin ventana
+    matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+
+_PALETA = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100",   # misma paleta
+           "#e87ba4", "#008300", "#4a3aa7", "#e34948"]   # que core/exercise.py
+_TINTA = "#1a1a19"
+temps = sorted(casos)
+fig, ax = plt.subplots(figsize=(8.0, 5.0), dpi=120)
+y_por_sp = {sp: [next(f for f in filas if f["T (K)"] == T)[f"y_{sp}"] for T in temps]
+            for sp in especies}
+for k, sp in enumerate(especies):                          # color fijo por especie
+    ax.plot(temps, y_por_sp[sp], color=_PALETA[k], lw=2, marker="o", ms=6, label=sp)
+# etiquetas directas al final de cada línea, en tinta, sin encimarse
+y_fin = sorted(((y_por_sp[sp][-1], sp) for sp in especies), reverse=True)
+sep, y_prev = 0.035 * (y_fin[0][0] - y_fin[-1][0]), None
+dx = 0.012 * (temps[-1] - temps[0])
+for v, sp in y_fin:
+    y_lab = v if y_prev is None else min(v, y_prev - sep)
+    ax.annotate(sp, (temps[-1], v), xytext=(temps[-1] + dx, y_lab),
+                fontsize=8.5, color=_TINTA, va="center")
+    y_prev = y_lab
+ax.set_xlabel("T (K)", color=_TINTA)
+ax.set_ylabel("y_i (fracción mol)", color=_TINTA)
+ax.set_title("Reformado de propano con vapor — composición de equilibrio",
+             color=_TINTA, fontsize=11)
+ax.set_xticks(temps)
+ax.set_xlim(temps[0] - dx, temps[-1] + 6.5 * dx)          # aire para las etiquetas
+ax.grid(axis="y", color="#dddddd", lw=0.7)
+for lado in ("top", "right"):
+    ax.spines[lado].set_visible(False)
+ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.12), ncol=len(especies),
+          frameon=False, fontsize=8.5, labelcolor=_TINTA)
+fig.tight_layout()
+SALIDAS.mkdir(exist_ok=True)
+fig.savefig(SALIDAS / "grafica_ej2_reformado_propano.png", facecolor="white")
+if "ipykernel" in sys.modules:
+    plt.show()
+else:
+    plt.close(fig)
+
+# %% Verificación contra la clave de respuestas del profesor
 TOL_CLAVE = 1e-4   # tolerancia relativa por valor
 
 clave_xi = {   # T: (xi_1, xi_2, xi_3)
@@ -204,5 +306,5 @@ for T, X, S_ref, S_CO, S_CO2, S_CH4, Y_H2, H2_CO, H2_COx, Y_H2_alim in resumen:
 print(f"\n  Resultado: "
       f"{'TODOS los valores PASS' if todo_pass else '*** HAY VALORES FAIL ***'}")
 
-# ---------- Autovalidación del barrido: Le Chatelier (punto 11) ----------
-validate_sweep(casos, xi_resueltos)
+# %% Selfcheck del barrido — Le Chatelier (punto 11)
+reporte_barrido = validate_sweep(casos, xi_resueltos)

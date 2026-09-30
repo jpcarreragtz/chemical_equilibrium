@@ -49,6 +49,28 @@ a mano, `[info]` 4/5/12 = compara δ_j y n_T(ξ), la expresión simbólica de
 cada K y el factor (P/P°)^δ contra tu derivación a mano. CSV y gráfica
 quedan en `salidas/`.
 
+## Ejecutar por celdas en VS Code (tablas y gráficas inline)
+
+`plantilla/plantilla_ejercicio.py` y `ejercicios/ej2_mio.py` están divididos
+en celdas con marcadores `# %%` (comentarios: no cambian nada al correr
+como script). Para verlos en el Interactive Window:
+
+1. Selecciona el intérprete correcto: `Cmd+Shift+P` → "Python: Select
+   Interpreter" (el que tenga numpy/scipy/matplotlib; para las tablas
+   también `pandas`: `pip3 install pandas`).
+2. Abre el `.py`, pon el cursor en una celda y `Shift+Enter` (o el botón
+   "Run Cell" que aparece sobre `# %%`). "Run All" corre el archivo de
+   arriba a abajo.
+3. El Interactive Window muestra la salida de texto, los DataFrames
+   (K(T), ξ/n_i/y_i, resumen de selfcheck) y la gráfica y_i vs T inline.
+   Las celdas de tabla/gráfica solo tienen efecto en el kernel.
+
+`python3 archivo.py` desde la carpeta del script sigue siendo la forma
+canónica y la que valida selfcheck: su salida es exactamente la misma que
+antes de dividir el archivo en celdas. Si al correr una celda falla el
+`sys.path`, revisa que el directorio de trabajo del kernel sea la carpeta
+del script (ajuste `jupyter.notebookFileRoot`, por omisión `${fileDirname}`).
+
 ## Cómo correr los tests
 
 ```bash

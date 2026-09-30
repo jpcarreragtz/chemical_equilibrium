@@ -11,6 +11,11 @@ Cómo usarla
    [FAIL] = no confíes; [WARN] = revísalo a mano; [info] 4/5/12 = compara
    con tu derivación (delta_j y n_T, expresión de cada K, factor (P/P0)^δ).
 
+El archivo está dividido en celdas `# %%` para el Interactive Window de
+VS Code (Shift+Enter sobre una celda): las celdas de tabla y gráfica solo
+muestran cosas ahí; como script (`python3 archivo.py`) no imprimen nada y
+la salida es exactamente la de siempre.
+
 Reglas de captura
 -----------------
 * Reacciones como texto CON coeficientes: "C3H8 + 3 H2O = 3 CO + 7 H2".
@@ -30,12 +35,41 @@ C3H8 = C2H4 + CH4 y C3H8 = C3H6 + H2, 10 mol/s de C3H8, 1 bar,
 T = 650–1000 K, con K calculadas de las Tablas C.1/C.4 de SVA.
 """
 
+# %% Setup — shim de sys.path e imports
 import sys, pathlib
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))  # raíz del proyecto
+try:
+    _RAIZ = pathlib.Path(__file__).resolve().parents[1]          # raíz del proyecto
+except NameError:                                                # celda/notebook sin __file__
+    _RAIZ = next((p for p in [pathlib.Path.cwd(), *pathlib.Path.cwd().parents]
+                  if (p / "core" / "exercise.py").exists()), None)
+    if _RAIZ is None:
+        raise RuntimeError("no encuentro core/ desde el cwd: corre el kernel "
+                           "con la carpeta del script como directorio de trabajo")
+sys.path.insert(0, str(_RAIZ))
 
 from core.exercise import run_exercise
 
-# ══════════════════════════ INPUTS (edita SOLO esto) ══════════════════════
+try:
+    import pandas as pd              # solo para las tablas inline (pip3 install pandas)
+except ImportError:                  # sin pandas el script corre igual; las
+    pd = None                        # celdas de tabla no muestran nada
+
+# %% [markdown]
+# ## Enunciado
+#
+# _(Escribe aquí el enunciado tal como viene en la tarea/examen.)_
+#
+# **Reacciones**
+#
+# - R1: $\mathrm{C_3H_8 \rightleftharpoons C_2H_4 + CH_4}$ &nbsp; (δ₁ = +1)
+# - R2: $\mathrm{C_3H_8 \rightleftharpoons C_3H_6 + H_2}$ &nbsp; (δ₂ = +1)
+#
+# **Alimentación y condiciones:** 10 mol/s de C₃H₈, P = 1 bar, T = 650–1000 K.
+#
+# **Balances con ξ:** $n_T = n_0 + \delta_1\,\xi_1 + \delta_2\,\xi_2$
+# (revisa el `[info] 4` del selfcheck contra tu derivación a mano).
+
+# %% Reacciones y alimentación — INPUTS (edita SOLO esto)
 titulo = "Pirólisis de propano (caso examen)"
 
 reacciones = [                       # texto con coeficientes, ya balanceadas
@@ -66,6 +100,10 @@ datos_termo = None                   # o pásalos a mano: {especie: {Hf298,
 limitante = "C3H8"                   # None = elige el 1er reactivo de R1
 # ══════════════════════════ FIN DE INPUTS ═════════════════════════════════
 
+# %% Resolver — K(T) (ec. 13.18 si modo termo) + solver + selfcheck + CSV + PNG
+# run_exercise hace todo en una llamada e imprime el reporte completo
+# (K por T, ξ, n_i, y_i, X, los 12 puntos de autovalidación, resumen del
+# barrido). Las celdas de abajo solo RE-LEEN lo que devuelve; no recalculan.
 resultado = run_exercise(
     titulo=titulo, reacciones=reacciones, alimentacion=alimentacion,
     fase=fase, P=P, P0=P0, unidad=unidad, temperaturas=temperaturas,
@@ -73,3 +111,53 @@ resultado = run_exercise(
     especies_termo=especies_termo, K_es_Kc=K_es_Kc,
     limitante=limitante,
 )
+
+# %% K(T) — constantes usadas en cada T (en modo termo, con ΔH° y ΔG° de la ec. 13.18)
+por_T = resultado["resultados"]          # {T: {"res", "K", "X", "termo", "reporte"}}
+filas_K = []
+for T in sorted(por_T):
+    fila = {"T (K)": T}
+    fila.update({f"K{j + 1}": k for j, k in enumerate(por_T[T]["K"])})
+    if por_T[T]["termo"] is not None:    # modo termo: ΔH°(T), ΔG°(T) por reacción
+        for j, t in enumerate(por_T[T]["termo"]):
+            fila[f"dH°_R{j + 1} (kJ/mol)"] = t["dH"] / 1000.0
+            fila[f"dG°_R{j + 1} (kJ/mol)"] = t["dG"] / 1000.0
+    filas_K.append(fila)
+tabla_K = pd.DataFrame(filas_K).set_index("T (K)") if pd else filas_K
+tabla_K
+
+# %% Tabla de resultados — ξ_j, X del limitante, n_i y fracciones mol por T
+especies = resultado["especies"]
+frac = "x" if fase != "gas" else "y"
+filas = []
+for T in sorted(por_T):
+    r = por_T[T]["res"]                  # ExtentResult del solver
+    fila = {"T (K)": T}
+    fila.update({f"xi_{j + 1}": x for j, x in enumerate(r.xi)})
+    fila[f"X_{resultado['limitante']}"] = por_T[T]["X"]
+    fila.update({f"n_{sp}": r.moles[sp] for sp in especies})
+    fila.update({f"{frac}_{sp}": r.mole_fractions[sp] for sp in especies})
+    filas.append(fila)
+tabla_resultados = pd.DataFrame(filas).set_index("T (K)") if pd else filas
+tabla_resultados
+
+# %% Gráfica — y_i vs T (la misma PNG que run_exercise ya guardó en salidas/)
+# core dibuja con el backend Agg y cierra la figura, así que aquí se muestra
+# el PNG guardado tal cual (idéntico al archivo) en vez de redibujar.
+try:
+    from IPython.display import Image
+    grafica = Image(filename=resultado["png"]) if resultado["png"] else None
+except ImportError:
+    grafica = None
+grafica
+
+# %% Selfcheck — resumen de los 12 puntos por T (el detalle ya se imprimió en "Resolver")
+filas_sc = [{"T (K)": T,
+             "PASS": por_T[T]["reporte"].n_pass,
+             "WARN": por_T[T]["reporte"].n_warn,
+             "FAIL": por_T[T]["reporte"].n_fail,
+             "ok": por_T[T]["reporte"].ok,
+             "veredicto global": resultado["veredicto"]}
+            for T in sorted(por_T)]
+tabla_selfcheck = pd.DataFrame(filas_sc).set_index("T (K)") if pd else filas_sc
+tabla_selfcheck
