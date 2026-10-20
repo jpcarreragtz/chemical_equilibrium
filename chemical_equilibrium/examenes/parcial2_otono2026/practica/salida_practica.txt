@@ -9,16 +9,16 @@
 0) DATOS TERMO (Tablas C.1/C.4 SVA)
    ΔH°298 = -46110 J/mol   ΔG°298 = -16450 J/mol   K298 = 762.21
    ΔA = -2.9355  ΔB = 2.0905e-03  ΔC = 0.0e+00  ΔD = -3.3050e+04
-   δ = Σν = -1  → K = K_phi·K_y·(P/P°)^δ
+   δ = Σν = -1  → K = F·K_y·(P/P°)^δ   (F = 1 en gas ideal)
 
 a) T = 300 K, P = 1 bar, gas ideal
    K(300) = 679.572   (ln K = 6.5215)
    ξ/(2−ξ) ... resuelve K_y(ξ) = K → ξ = 0.966362,  n_T = 1.033638
-  | especie   |      n_i |      y_i |
-  |-----------|----------|----------|
-  | NH3       | 0.96636  | 0.93491  |
-  | N2        | 0.016819 | 0.016271 |
-  | H2        | 0.050456 | 0.048814 |
+  | especie | n_i      | y_i      |
+  |---------|----------|----------|
+  | NH3     | 0.96636  | 0.93491  |
+  | N2      | 0.016819 | 0.016271 |
+  | H2      | 0.050456 | 0.048814 |
    → y_NH3 = 0.9349     (maestra 0.9349)
 
    Para y_NH3 = 0.50: ξ = 0.6667, y_N2 = 0.125, y_H2 = 0.375, K_y = 6.1584
@@ -30,38 +30,45 @@ c) P = 100 bar, gas ideal: K requerida = K_y/100 = 0.06158
    → T = 577.64 K     (maestra 577.6 K; compañero 551.0 K)
 
 d) P = 100 bar, SOLUCIÓN IDEAL (Lewis-Randall, φ_i puro, Pitzer)
-  | esp   |     Tc |     Pc |      ω |      Tr |      Pr |        B0 |      B1 |       φ | Vr≥2   |
-  |-------|--------|--------|--------|---------|---------|-----------|---------|---------|--------|
-  | NH3   | 405.7  | 112.8  |  0.253 |  1.4408 | 0.88652 | -0.15226  | 0.1019  | 0.92513 | NO*    |
-  | N2    | 126.2  |  34    |  0.038 |  4.6318 | 2.9412  |  0.046682 | 0.13872 | 1.0335  | NO*    |
-  | H2    |  33.19 |  13.13 | -0.216 | 17.612  | 7.6161  |  0.078714 | 0.139   | 1.0213  | sí     |
-   K_phi = φ_NH3/(φ_N2^½ φ_H2^3/2) = 0.88170
-   K requerida = K_phi·K_y/100 = 0.05430  = K(584.53 K) = 0.05430
-   → T = 584.53 K   (maestra 568.6 K; compañero 557.0 K)
+   Convención 'maestra' (core/convenciones.py):
+   K = K_y·(P/P°)^δ / K_phi   ⇔   K_y = K·(P/P°)^(−δ)·K_phi   [convención de la maestra; F = 1/K_phi]
+  | esp | Tc    | Pc    | ω      | Tr     | Pr      | B0       | B1       | φ       | Vr≥2 |
+  |-----|-------|-------|--------|--------|---------|----------|----------|---------|------|
+  | NH3 | 405.7 | 112.8 | 0.253  | 1.406  | 0.88652 | -0.16164 | 0.097887 | 0.91731 | NO*  |
+  | N2  | 126.2 | 34    | 0.038  | 4.5199 | 2.9412  | 0.045234 | 0.1387   | 1.0334  | NO*  |
+  | H2  | 33.19 | 13.13 | -0.216 | 17.186 | 7.6161  | 0.078543 | 0.139    | 1.0217  | sí   |
+   K_phi = φ_NH3/(φ_N2^½ φ_H2^3/2) = 0.87373   →   F = 1.14452
+   K requerida = F·K_y/100 = 0.07048  = K(570.42 K) = 0.07048
+   → T = 570.42 K   (maestra 568.6 K; compañero 557.0 K)
 
-   NOTA sobre d)  (DISCREPANCIA CON LA CLAVE)
-   * φ_NH3 < 1 y φ_N2, φ_H2 > 1  → K_phi < 1 → se necesita una K MENOR
-     que en c) → T_d > T_c. Físicamente: la no idealidad a 100 bar
-     FAVORECE al NH3 (por eso T_d = 584.5 K > T_c = 577.6 K).
-   * Si K_phi se aplica INVERTIDO (K_y = K·P·K_phi en vez de ÷K_phi)
-     sale T = 570.4 K ≈ clave de la maestra (568.6 K).
-   * Invertido Y sin el término ω·B1 (ln φ = Pr/Tr·B0) sale T = 568.6 K = clave exacta.
-     → la clave combina 2 cosas: K_phi del lado equivocado (~14 K) y omitir ω·B1 (~2 K).
+   NOTA sobre d)  (las dos convenciones de K_phi; ver core/convenciones.py)
+   * 'rigurosa' (f^_i = φ_i y_i P): φ_NH3 < 1 y φ_N2, φ_H2 > 1 → K_phi < 1 → K requerida MENOR
+     que en c) → T = 584.5 K > T_c = 577.6 K (la no idealidad favorece al NH3).
+   * 'maestra' (K_y = K·P·K_phi): T = 570.4 K < T_c; sin el término ω·B1 (ln φ = Pr/Tr·B0)
+     sale T = 568.6 K = clave exacta (568.6 K): la clave omite ω·B1 (~1.9 K).
+   * Virial TRUNCADA con B de van der Waals (B = b − a/RT, ej. 9.25):
+     φ_NH3 = 0.8941, φ_N2 = 1.0206, φ_H2 = 1.0457, K_phi = 0.8277 → T = 567.6 K ('maestra'; 'rigurosa': 587.4 K)
+     (Pitzer ln φ = (Pr/Tr)(B0 + ωB1) TAMBIÉN es virial truncada, Z = 1 + BP/RT)
    * φ_NH3 por Lee-Kesler (Tablas E.13/E.14) a Tr = 1.441, Pr = 0.887: 0.9269
-     vs Pitzer 0.9251 → el método de φ NO explica la diferencia.
+     vs Pitzer 0.9251 → el método de φ NO explica la diferencia entre convenciones.
    * Vr < 2 para NH3 y N2: la virial está en el borde de validez
      (warning de SVA Fig. 3.14); es lo que se ve en clase (Sesión 13).
 
 AUTOVALIDACIÓN
   [PASS] b) re-resolviendo a T = 399.50 K: y_NH3 = 0.50000000
   [PASS] c) re-resolviendo a T = 577.64 K: y_NH3 = 0.50000000
-  [PASS] d) re-resolviendo a T = 584.53 K: y_NH3 = 0.50000000
+  [PASS] d 'maestra') re-resolviendo a T = 570.42 K: y_NH3 = 0.50000000
+  [PASS] d 'rigurosa') re-resolviendo a T = 584.53 K: y_NH3 = 0.50000000
   [PASS] balance atómico a): N = 1.000000000000 (1), H = 3.000000000000 (3)
   [PASS] a) vs clave: 0.9349 vs 0.9349
   [PASS] b) vs clave: 399.4993 vs 399.5
   [PASS] c) vs clave: 577.6395 vs 577.6
-  [PASS] tendencia física d) > c) (584.5 > 577.6 K)
-  [info] d) clave 568.6 K ≠ 584.5 K: ver NOTA (K_phi invertido)
+  [PASS] d) 'maestra' 570.4 K vs clave 568.6 K (dif < 2.5 K; es el término ω·B1)
+  [PASS] d) 'maestra' sin ω·B1 = 568.6 K = clave (atol 0.1 K)
+  [PASS] tendencia: T_rigurosa (584.5) > T_c (577.6) > T_maestra (570.4 K), consistente con K_phi < 1
+
+>>> RESULTADO d) (convención por default 'maestra'): T = 570.4 K
+    (la otra convención, 'rigurosa', da 584.5 K; ver NOTA)
 
 VEREDICTO: OK
 
@@ -103,22 +110,22 @@ VEREDICTO: OK
 ========================================================================
 
 1) ΔH°c de cada combustible (ley de Hess, ΔH°f de la Tabla C.4)
-  | reacción                        |   ΔH°c H2O(l) kJ/mol |   ΔH°c H2O(g) kJ/mol |
-  |---------------------------------|----------------------|----------------------|
-  | 1 CH4 + 2 O2 → 1 CO2 + 2 H2O    |              -890.65 |              -802.62 |
-  | 1 C2H6 + 3.5 O2 → 2 CO2 + 3 H2O |             -1560.7  |             -1428.7  |
-  | 1 C3H8 + 5 O2 → 3 CO2 + 4 H2O   |             -2219.2  |             -2043.1  |
+  | reacción                        | ΔH°c H2O(l) kJ/mol | ΔH°c H2O(g) kJ/mol |
+  |---------------------------------|--------------------|--------------------|
+  | 1 CH4 + 2 O2 → 1 CO2 + 2 H2O    | -890.65            | -802.62            |
+  | 1 C2H6 + 3.5 O2 → 2 CO2 + 3 H2O | -1560.7            | -1428.7            |
+  | 1 C3H8 + 5 O2 → 3 CO2 + 4 H2O   | -2219.2            | -2043.1            |
    (ΔH°f H2O(l) = -285830 J/mol)
 
 2) EXPRESIÓN GENERAL (kJ/mol de gas natural):
    ΔH°c = -890.649·y_CH4 + (-1560.688)·y_C2H6 + (-2219.167)·y_C3H8
 
 3) RESULTADOS
-  | inciso   |   y_CH4 |   y_C2H6 |   y_C3H8 |   y_N2 |   ΔH°c kJ/mol |   maestra |   diferencia |
-  |----------|---------|----------|----------|--------|---------------|-----------|--------------|
-  | a        |    0.95 |     0.02 |     0.02 |   0.01 |       -921.71 |   -921.71 |     -0.00365 |
-  | b        |    0.9  |     0.05 |     0.03 |   0.02 |       -946.19 |   -946.16 |     -0.03351 |
-  | c        |    0.85 |     0.07 |     0.03 |   0.05 |       -932.87 |   -923.87 |     -9.0048  |
+  | inciso | y_CH4 | y_C2H6 | y_C3H8 | y_N2 | ΔH°c kJ/mol | maestra | diferencia |
+  |--------|-------|--------|--------|------|-------------|---------|------------|
+  | a      | 0.95  | 0.02   | 0.02   | 0.01 | -921.71     | -921.71 | -0.00365   |
+  | b      | 0.9   | 0.05   | 0.03   | 0.02 | -946.19     | -946.16 | -0.03351   |
+  | c      | 0.85  | 0.07   | 0.03   | 0.05 | -932.87     | -923.87 | -9.0048    |
 
    → Mayor calor de combustión (|ΔH°c| máximo): inciso b) con -946.19 kJ/mol
 
@@ -151,17 +158,17 @@ VEREDICTO: OK
 1) BALANCE DE MATERIA (base 1 mol de producto)
    Alimentación: CH4 = 0.2000 mol, H2O = 0.4000 mol  (relación H2O/CH4 = 2.00)
    ξ1 = 0.2000   ξ2 = 0.0275   (residual 1.1e-16)
-   Balance atómico (sal − ent): {'C': 2.7755575615628914e-17, 'H': -2.220446049250313e-16, 'O': -1.1102230246251565e-16}
+   Balance atómico (sal − ent): {'C': 2.7755575615628914e-17, 'H': 0.0, 'O': -5.551115123125783e-17}
 
 2) BALANCE DE ENERGÍA   Q = ΔH°_R + Σξ·ΔH°298 + ΔH°_P
    ΔH°298,1 = 205813 J   ΔH°298,2 = -41166 J
-  | término                                     |   J/mol de producto |
-  |---------------------------------------------|---------------------|
-  | ΔH°_R (reactivos 773.15 → 298.15 K)         |              -11455 |
-  | ξ1·ΔH°298,1 + ξ2·ΔH°298,2                   |               40031 |
-  | ΔH°_P (productos 298.15 → 1123.15 K)        |               26305 |
-  | Q = ΔH                                      |               54881 |
-  | Q por entalpías de formación (comprobación) |               54881 |
+  | término                                     | J/mol de producto |
+  |---------------------------------------------|-------------------|
+  | ΔH°_R (reactivos 773.15 → 298.15 K)         | -11455            |
+  | ξ1·ΔH°298,1 + ξ2·ΔH°298,2                   | 40031             |
+  | ΔH°_P (productos 298.15 → 1123.15 K)        | 26305             |
+  | Q = ΔH                                      | 54881             |
+  | Q por entalpías de formación (comprobación) | 54881             |
    ⟨Cp⟩_H productos = 31.885 J/K
 
    → Q = 54881 J por mol de gas producido   (maestra 54881 J)
@@ -185,24 +192,24 @@ VEREDICTO: OK
 1) BALANCE DE MATERIA (base 1 mol de combustible)
    ξ1 (→CO2) = 0.6580   ξ2 (→CO) = 0.2820
    O2 alimentado = 1.35·2·0.94 = 2.5380   N2 aire = 9.5477
-  | salida   |    mol |
-  |----------|--------|
-  | O2       | 0.799  |
-  | N2       | 9.6077 |
-  | CO2      | 0.658  |
-  | H2O      | 1.88   |
-  | CO       | 0.282  |
+  | salida | mol    |
+  |--------|--------|
+  | O2     | 0.799  |
+  | N2     | 9.6077 |
+  | CO2    | 0.658  |
+  | H2O    | 1.88   |
+  | CO     | 0.282  |
    Balance atómico: {'C': 0.0, 'H': 0.0, 'N': 0.0, 'O': 0.0}
 
 2) BALANCE DE ENERGÍA DEL LADO DE LOS GASES (por mol de combustible)
-  | término                               |    J/mol comb. |
-  |---------------------------------------|----------------|
-  | ΔH°_R (entradas a 298.15 K)           |     0          |
-  | ΔH°298,1 = -802625 J                  |    -5.2813e+05 |
-  | ΔH°298,2 = -519641 J                  |    -1.4654e+05 |
-  | ΔH°_P (298.15 → 483.15 K)             | 75412          |
-  | ΔH gases = Q                          |    -5.9925e+05 |
-  | comprobación (entalpías de formación) |    -5.9925e+05 |
+  | término                               | J/mol comb. |
+  |---------------------------------------|-------------|
+  | ΔH°_R (entradas a 298.15 K)           | 0           |
+  | ΔH°298,1 = -802625 J                  | -5.2813e+05 |
+  | ΔH°298,2 = -519641 J                  | -1.4654e+05 |
+  | ΔH°_P (298.15 → 483.15 K)             | 75412       |
+  | ΔH gases = Q                          | -5.9925e+05 |
+  | comprobación (entalpías de formación) | -5.9925e+05 |
    Calor transferido al agua = −ΔH = 599254 J/mol de combustible
 
 3) LADO DEL AGUA

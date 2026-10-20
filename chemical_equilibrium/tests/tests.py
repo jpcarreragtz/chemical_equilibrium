@@ -15,7 +15,9 @@ Casos:
   i) Parser de reacciones (fórmulas, coeficientes, balance)
   ... j–l) ver cada función
   m) Energía/combustión: HHV/LHV, T flama CH4 (SVA 4.7), Problemas 3–5 del 2do parcial
-  n) Presión/no idealidad: Problema 1 (NH3, Lewis-Randall) y 2 (Margules)
+  n) Presión/no idealidad: Problema 1 (NH3, Lewis-Randall con las dos
+     convenciones de K_phi de core/convenciones.py, run_exercise con
+     fugacidad="lewis") y 2 (Margules)
 """
 
 from __future__ import annotations
@@ -437,15 +439,61 @@ def caso_n():
           399.5, atol=0.1)
     check("P1 c) T (K)", brentq(lambda T: lnK(T) - log(ky / 100), 300, 1500),
           577.6, atol=0.1)
+    # --- core/convenciones.py: ÚNICO lugar donde se decide cómo entra K_phi
+    from core.convenciones import CONVENCION_KPHI, K_efectiva, factor_Kphi
+    print(f"  [info] convención default del proyecto: '{CONVENCION_KPHI}'")
+    check("factor_Kphi(0.8, 'rigurosa') = K_phi", factor_Kphi(0.8, "rigurosa"),
+          0.8, rtol=1e-12)
+    check("factor_Kphi(0.8, 'maestra') = 1/K_phi", factor_Kphi(0.8, "maestra"),
+          1.25, rtol=1e-12)
+    check("K_efectiva(2, 0.8, 'rigurosa') = K/K_phi",
+          K_efectiva(2.0, 0.8, "rigurosa"), 2.5, rtol=1e-12)
+    check("K_efectiva(2, 0.8, 'maestra') = K·K_phi",
+          K_efectiva(2.0, 0.8, "maestra"), 1.6, rtol=1e-12)
+    check("factor_Kphi sin convención usa el default",
+          factor_Kphi(0.8), factor_Kphi(0.8, CONVENCION_KPHI), rtol=1e-15)
+    try:
+        factor_Kphi(0.8, "otra")
+        print("  [FAIL] convención inválida NO fue rechazada")
+        FALLAS.append("convencion invalida")
+    except ValueError as e:
+        print(f"  [PASS] convención inválida rechazada: {str(e)[:60]}...")
+    # --- P1 d) con las dos convenciones (K_phi Lewis-Randall, Pitzer)
     crit = cargar_criticas(list(nu))
-    Td = brentq(lambda T: lnK(T) - log(K_phi_lewis(nu, T, 100.0, crit,
-                                                     avisar=False)[0]
-                                       * ky / 100), 300, 1500)
-    ok = Td > 577.6
-    print(f"  [{'PASS' if ok else 'FAIL'}] P1 d) Lewis-Randall: T = {Td:.1f}"
-          f" K > T_c (no idealidad favorece NH3; clave 568.6 K, ver p1)")
+
+    def T_d(conv):
+        return brentq(lambda T: lnK(T) - log(
+            factor_Kphi(K_phi_lewis(nu, T, 100.0, crit, avisar=False)[0], conv)
+            * ky / 100), 300, 1500)
+
+    check("P1 d) 'maestra' (K_y = K·P·K_phi) T (K)", T_d("maestra"), 570.4,
+          atol=0.2)
+    check("P1 d) 'rigurosa' (K_y = K·P/K_phi) T (K)", T_d("rigurosa"), 584.5,
+          atol=0.2)
+    # --- run_exercise con fugacidad="lewis" (K_ef = K/F) y sin fugacidad
+    import contextlib, io, os
+    from core.exercise import run_exercise
+
+    def y_NH3_run(T, fug):
+        with contextlib.redirect_stdout(io.StringIO()):
+            r = run_exercise(titulo="test n NH3", reacciones=["1/2 N2 + 3/2 H2 = NH3"],
+                             alimentacion={"N2": 0.5, "H2": 1.5}, fase="gas",
+                             P=100.0, P0=1.0, unidad="bar", temperaturas=[T],
+                             modo_K="termo", especies_termo=["N2", "H2", "NH3"],
+                             fugacidad=fug, csv_out=os.devnull)
+        return r["resultados"][T]["res"].mole_fractions["NH3"], r["veredicto"]
+
+    y, ver = y_NH3_run(570.4, "lewis")
+    check(f"run_exercise fugacidad='lewis' ({CONVENCION_KPHI}) 570.4 K, 100 bar: y_NH3",
+          y, 0.500, atol=1e-3)
+    ok = ver != "FAIL"
+    print(f"  [{'PASS' if ok else 'FAIL'}] selfcheck de run_exercise con "
+          f"fugacidad valida contra K_ef: {ver}")
     if not ok:
-        FALLAS.append("P1 d tendencia")
+        FALLAS.append("selfcheck lewis")
+    y, ver = y_NH3_run(577.64, None)
+    check("run_exercise fugacidad=None 577.64 K, 100 bar: y_NH3 (caso ideal intacto)",
+          y, 0.500, atol=1e-3)
     # Problema 2: Margules 1 parámetro
     K = exp(1000.0 / (R_J * 298.15))
     def F(x):

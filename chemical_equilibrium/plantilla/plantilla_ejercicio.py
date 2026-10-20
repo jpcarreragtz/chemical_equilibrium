@@ -29,6 +29,10 @@ Reglas de captura
 * K_es_Kc = True si tus K son K_C en mol/L (se convierten con
   K = K_C/C_T0^delta, C_T0 = P0/(R·T)); en fase líquida solo si delta = 0.
 * fase = "liquido": se usa K = Π x_i^ν y el factor de presión no aplica.
+* fugacidad = "lewis" (solo gas): K_phi = Π phi_i^ν con phi_i de especie
+  pura (Pitzer, Tc/Pc/ω de data/criticas_b1.json) y se resuelve con la K
+  efectiva según core/convenciones.py (convencion_Kphi = None → default
+  "maestra": K_y = K·(P/P°)^(−δ)·K_phi; "rigurosa": ÷K_phi, SVA 13.28).
 
 El ejemplo precargado es el CASO DEL EXAMEN: pirólisis de propano,
 C3H8 = C2H4 + CH4 y C3H8 = C3H6 + H2, 10 mol/s de C3H8, 1 bar,
@@ -98,6 +102,9 @@ datos_termo = None                   # o pásalos a mano: {especie: {Hf298,
                                      #  especies_termo)
 
 limitante = "C3H8"                   # None = elige el 1er reactivo de R1
+
+fugacidad = None          # None (gas ideal) | "lewis" (φ puro, Pitzer)
+convencion_Kphi = None    # None = core.convenciones (default "maestra")
 # ══════════════════════════ FIN DE INPUTS ═════════════════════════════════
 
 # %% Resolver — K(T) (ec. 13.18 si modo termo) + solver + selfcheck + CSV + PNG
@@ -110,6 +117,7 @@ resultado = run_exercise(
     modo_K=modo_K, K=K, datos_termo=datos_termo,
     especies_termo=especies_termo, K_es_Kc=K_es_Kc,
     limitante=limitante,
+    fugacidad=fugacidad, convencion_Kphi=convencion_Kphi,
 )
 
 # %% K(T) — constantes usadas en cada T (en modo termo, con ΔH° y ΔG° de la ec. 13.18)

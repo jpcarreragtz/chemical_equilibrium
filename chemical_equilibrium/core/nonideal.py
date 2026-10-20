@@ -143,6 +143,12 @@ def K_phi_lewis(nu: Dict[str, float], T: float, P: float,
     Lewis-Randall = "solución ideal de gases" (SVA sec. 13.7 / Sesión 13):
 
         K = K_phi · K_y · (P/P°)^δ      →     K_y = K·(P/P°)^(−δ) / K_phi
+        (forma rigurosa, SVA ec. 13.28)
+
+    CÓMO USARLO: esta función solo devuelve Π phi_i^nu_i. De qué lado de la
+    ecuación entra (convención "maestra" o "rigurosa") lo decide ÚNICAMENTE
+    core/convenciones.py (factor_Kphi, K_efectiva); no lo decidas aquí ni
+    en los scripts.
 
     Devuelve (K_phi, {especie: dict de phi_pitzer})."""
     import warnings as _w
@@ -156,3 +162,16 @@ def K_phi_lewis(nu: Dict[str, float], T: float, P: float,
     for sp, v in nu.items():
         Kphi *= detalle[sp]["phi"] ** v
     return Kphi, detalle
+
+
+def phi_virial_vdw(T: float, P: float, Tc: float, Pc: float) -> Dict[str, float]:
+    """phi de especie pura por la virial TRUNCADA con B de van der Waals
+    (Sesión 13, ej. 9.25):  Z = 1 + B·P/(R·T),  B = b − a/(R·T),
+        a = 27 R² Tc²/(64 Pc),  b = R·Tc/(8 Pc),   ln phi = B·P/(R·T)
+    T, Tc [K]; P, Pc [bar]. Devuelve dict con phi, B [m³/mol], a, b, Z."""
+    Rb = 8.314e-5                        # bar·m³/(mol·K)
+    a = 27.0 * Rb * Rb * Tc * Tc / (64.0 * Pc)
+    b = Rb * Tc / (8.0 * Pc)
+    B = b - a / (Rb * T)
+    lnphi = B * P / (Rb * T)
+    return {"phi": exp(lnphi), "B": B, "a": a, "b": b, "Z": 1.0 + lnphi}

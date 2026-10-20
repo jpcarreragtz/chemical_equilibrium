@@ -7,7 +7,8 @@ La plantilla (plantilla_ejercicio.py) solo llena UN bloque de inputs y llama:
     run_exercise(titulo=..., reacciones=[...], alimentacion={...}, fase="gas",
                  P=..., P0=..., unidad="bar", temperaturas=[...],
                  modo_K="directo" | "termo", K={...} | datos_termo={...},
-                 K_es_Kc=False, limitante=None)
+                 K_es_Kc=False, limitante=None,
+                 fugacidad=None | "lewis", criticas=None, convencion_Kphi=None)
 
 Hace, por cada T:
   parsear reacciones -> nu/átomos/inertes, obtener K (dadas, o de ΔG°f/ΔH°f/Cp
@@ -16,6 +17,14 @@ Hace, por cada T:
   modo termo) y correr selfcheck.validate (20 arranques aleatorios,
   |K_calc-K|/K < 1e-4). Al final: chequeo de Le Chatelier del barrido,
   tabla comparativa, CSV y gráfica y_i vs T (PNG).
+
+Fugacidad (fase gas, 2do parcial): con fugacidad="lewis" se calcula, por T y
+por reacción, K_phi_j = Π phi_i^nu_ij con phi_i de especie pura a (T, P)
+(Lewis-Randall, Pitzer; core.nonideal.K_phi_lewis) y se resuelve con la
+K efectiva  K_ef_j = K_efectiva(K_j, K_phi_j, convencion)  de
+core/convenciones.py (default CONVENCION_KPHI = "maestra"). Es válido porque
+con Lewis-Randall K_phi NO depende de la composición. selfcheck valida
+contra K_ef_j. Con fugacidad=None el comportamiento es el de siempre.
 """
 
 from __future__ import annotations
@@ -29,8 +38,15 @@ import numpy as np
 from . import SALIDAS
 from .equilibrium import Kc_to_Ky, conversion, format_table, solve_extents
 from .reactions import build_system, parse_reaction
+from .convenciones import describir, factor_Kphi, K_efectiva, validar_convencion
+from .nonideal import K_phi_lewis, cargar_criticas
 from .selfcheck import Problem, validate, validate_sweep
 from .thermo import cargar_datos, reaction_thermo
+
+# factor para pasar P a bar (phi_pitzer necesita P en la unidad de Pc = bar)
+_A_BAR = {"bar": 1.0, "atm": 1.01325, "kpa": 0.01, "mpa": 10.0, "pa": 1e-5,
+          "psi": 0.0689476, "psia": 0.0689476, "torr": 1.01325 / 760.0,
+          "mmhg": 1.01325 / 760.0}
 
 # Paleta categórica validada (orden FIJO, seguro para daltonismo en pares
 # adyacentes sobre fondo claro); la 9a serie se agrupa en "otras".
@@ -69,9 +85,19 @@ def run_exercise(*, titulo: str = "ejercicio",
                  csv_out: Optional[str] = None,
                  png_out: Optional[str] = None,
                  n_starts_check: int = 20,
-                 k_tol_check: float = 1e-4) -> dict:
+                 k_tol_check: float = 1e-4,
+                 fugacidad: Optional[str] = None,
+                 criticas: Optional[Dict[str, tuple]] = None,
+                 convencion_Kphi: Optional[str] = None) -> dict:
     """Resuelve el ejercicio completo. Devuelve un dict con todo
-    (resultados por T, rutas de CSV/PNG, reportes de selfcheck)."""
+    (resultados por T, rutas de CSV/PNG, reportes de selfcheck).
+
+    fugacidad       : None (gas ideal, K_phi = 1) | "lewis" (phi_i de especie
+                      pura por Pitzer; solo fase gas).
+    criticas        : {especie: (Tc, Pc, omega)}; None → cargar_criticas(...)
+                      de data/criticas_b1.json para las especies que reaccionan.
+    convencion_Kphi : None → core.convenciones.CONVENCION_KPHI ("maestra") |
+                      "maestra" | "rigurosa"."""
 
     # ---------- 0) armar el sistema a partir de los strings ----------
     if fase not in ("gas", "liquido", "líquido"):
@@ -85,6 +111,24 @@ def run_exercise(*, titulo: str = "ejercicio",
     nu_arr = np.array(nu, dtype=float)
     deltas = nu_arr.sum(axis=1)
     frac_sym = "x" if es_liquido else "y"
+    participantes = sorted({sp for nud in nu_dicts for sp in nud})
+
+    # ---------- fugacidad (Lewis-Randall) ----------
+    if fugacidad not in (None, "lewis"):
+        raise ValueError("fugacidad debe ser None o 'lewis'")
+    con_phi = fugacidad == "lewis"
+    P_bar = None
+    if con_phi:
+        if es_liquido:
+            raise ValueError("fugacidad='lewis' solo aplica a fase gas "
+                             "(en líquido usa gammas en la expresión de K)")
+        convencion_Kphi = validar_convencion(convencion_Kphi)
+        if criticas is None:
+            criticas = cargar_criticas(participantes)
+        if unidad.lower() not in _A_BAR:
+            raise ValueError(f"no sé pasar '{unidad}' a bar para phi_pitzer; "
+                             f"unidades conocidas: {sorted(_A_BAR)}")
+        P_bar = float(P) * _A_BAR[unidad.lower()]
 
     # reactivo limitante para reportar X (por omisión: primer reactivo de R1
     # presente en la alimentación)
@@ -109,7 +153,6 @@ def run_exercise(*, titulo: str = "ejercicio",
         elif especies_termo is not None:
             print("  (nota: se dieron datos_termo Y especies_termo; "
                   "se usan los datos_termo explícitos)")
-        participantes = sorted({sp for nud in nu_dicts for sp in nud})
         sin_datos = [sp for sp in participantes if sp not in datos_termo]
         if sin_datos:
             raise ValueError(
@@ -138,6 +181,11 @@ def run_exercise(*, titulo: str = "ejercicio",
     terms = "".join(f" {'+' if d > 0 else '-'} {abs(d):g}·xi_{j + 1}"
                     for j, d in enumerate(deltas) if abs(d) > 1e-12)
     print(f"  n_T = {n0_tot:g}{terms if terms else '   (constante)'}")
+    if con_phi:
+        print(f"  Fugacidad: Lewis-Randall (phi_i de especie pura, Pitzer) a "
+              f"P = {P_bar:g} bar")
+        print(f"  Convención K_phi '{convencion_Kphi}':  {describir(convencion_Kphi)}")
+        print("  El solver recibe K_ef = K/F y selfcheck valida contra K_ef.")
     if modo_K == "termo":
         pendientes = [sp for sp in sorted(datos_termo)
                       if "pendiente" in str(datos_termo[sp].get("verificado",
@@ -199,6 +247,36 @@ def run_exercise(*, titulo: str = "ejercicio",
             print("  K usadas: " + ", ".join(f"K{j + 1} = {k:.5g}"
                                              for j, k in enumerate(K_lista)))
 
+        # --- fugacidad: K_phi_j y K efectiva (core/convenciones.py) ---
+        Kphi_lista, K_sin_phi, phi_detalle = None, None, None
+        if con_phi:
+            K_sin_phi = list(K_lista)
+            Kphi_lista, phi_detalle = [], {}
+            for nud in nu_dicts:
+                kphi, det = K_phi_lewis(nud, T, P_bar, criticas, avisar=False)
+                Kphi_lista.append(kphi)
+                phi_detalle.update(det)
+            K_lista = [K_efectiva(k, kp, convencion_Kphi)
+                       for k, kp in zip(K_sin_phi, Kphi_lista)]
+            print("  " + format_table(
+                [[sp, d["Tr"], d["Pr"], d["B0"], d["B1"], d["phi"],
+                  "sí" if d["valido"] else "NO*"]
+                 for sp, d in phi_detalle.items()],
+                ["esp", "Tr", "Pr", "B0", "B1", "phi", "Vr>=2"]
+            ).replace("\n", "\n  "))
+            fuera_virial = [sp for sp, d in phi_detalle.items()
+                            if not d["valido"]]
+            if fuera_virial:
+                print("  [OJO] phi extrapolado fuera de la zona virial (Vr < 2,"
+                      " Fig. 3.14 SVA): " + ", ".join(fuera_virial))
+            print(f"  K_phi y K efectiva (convención '{convencion_Kphi}', "
+                  f"K_ef = K/F):")
+            print("  " + format_table(
+                [[f"R{j + 1}", k, kp, factor_Kphi(kp, convencion_Kphi), ke]
+                 for j, (k, kp, ke) in enumerate(zip(K_sin_phi, Kphi_lista,
+                                                     K_lista))],
+                ["Rxn", "K", "K_phi", "F", "K_ef"]).replace("\n", "\n  "))
+
         # --- resolver ---
         res = solve_extents(especies, alimentacion, nu, K_lista,
                             P=P_ef, P0=P0_ef, atoms=atomos)
@@ -220,7 +298,9 @@ def run_exercise(*, titulo: str = "ejercicio",
         reportes.append(rep)
 
         resultados[T] = {"res": res, "K": K_lista, "X": X,
-                         "termo": termo_info, "reporte": rep}
+                         "termo": termo_info, "reporte": rep,
+                         "Kphi": Kphi_lista, "K_sin_phi": K_sin_phi,
+                         "phi": phi_detalle}
         K_usadas[T] = K_lista
         xi_por_T[T] = tuple(res.xi)
 
@@ -267,7 +347,8 @@ def run_exercise(*, titulo: str = "ejercicio",
     return {"titulo": titulo, "especies": especies, "nu": nu,
             "inertes": inertes, "limitante": limitante,
             "resultados": resultados, "csv": csv_path, "png": png_path,
-            "veredicto": veredicto}
+            "veredicto": veredicto, "fugacidad": fugacidad,
+            "convencion_Kphi": convencion_Kphi if con_phi else None}
 
 
 # ----------------------------------------------------------------------------

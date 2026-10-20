@@ -11,7 +11,7 @@ Datos: Tablas C.1 (Cp/R) y C.4 (ΔH°f, ΔG°f) de Smith–Van Ness (en
 | 1 a) | `p1_amoniaco_presion.py` | y_NH3 = 0.9349 | 0.9349 | ✔ |
 | 1 b) | | T = 399.50 K | 399.5 K | ✔ |
 | 1 c) | | T = 577.64 K | 577.6 K (compañero 551) | ✔ |
-| 1 d) | | **T = 584.5 K** | 568.6 K (compañero 557) | ⚠ ver nota |
+| 1 d) | | **T = 570.4 K** (convención "maestra", default) | 568.6 K (compañero 557) | ✔ (dif 1.8 K = término ω·B¹; ver nota) |
 | 2 a) | `p2_isomerizacion_margules.py` | x_A = 0.3955 | 0.3955 | ✔ |
 | 2 b) | | x_A = 0.4005 (error ideal +1.27 %) | 0.4005 | ✔ |
 | 3 a) | `p3_gas_natural_hhv.py` | −921.71 kJ/mol | −921.71 | ✔ |
@@ -26,8 +26,10 @@ Correr todo: `python3 correr_todo.py` (resume veredictos y guarda `salida_practi
 
 ## Fórmulas base (las que se usan en todo)
 
-* **K y presión (gas):** K = K_φ · K_y · (P/P°)^δ, con K_y = Π y_i^ν_i, K_φ = Π φ̂_i^ν_i, δ = Σν_i.
-  - Gas ideal: K_φ = 1. Solución ideal de gases (Lewis-Randall): φ̂_i = φ_i (especie pura a T, P).
+* **K y presión (gas):** K = F · K_y · (P/P°)^δ, con K_y = Π y_i^ν_i, K_φ = Π φ̂_i^ν_i, δ = Σν_i.
+  - Gas ideal: K_φ = 1 (F = 1). Solución ideal de gases (Lewis-Randall): φ̂_i = φ_i (especie pura a T, P).
+  - **Convención de la maestra (default en `core/convenciones.py`):** F = 1/K_φ ⇒ K = K_y·(P/P°)^δ / K_φ ⇔ **K_y = K·(P/P°)^(−δ)·K_φ**.
+  - Convención rigurosa (f̂_i = φ_i y_i P, SVA 13.28): F = K_φ ⇒ K_y = K·(P/P°)^(−δ)/K_φ. Disponible con `convencion_Kphi="rigurosa"`.
 * **φ por la virial de Pitzer (Sesión 13):** ln φ = (P_r/T_r)(B⁰ + ωB¹), B⁰ = 0.083 − 0.422/T_r^1.6, B¹ = 0.139 − 0.172/T_r^4.2.
 * **K(T) rigurosa (ec. 13.18 SVA):**
   −ln K = ΔG°/RT = (ΔG°₀ − ΔH°₀)/(RT₀) + ΔH°₀/(RT) + (1/T)·∫(ΔCp/R)dT − ∫(ΔCp/R)dT/T
@@ -51,10 +53,10 @@ Correr todo: `python3 correr_todo.py` (resume veredictos y guarda `salida_practi
 5. **y_NH₃ = 0.5 ⇒ ξ = 2/3**, y_N₂ = 0.125, y_H₂ = 0.375 ⇒ **K_y = 6.1584** (fijo: sólo cambia qué K se necesita).
 6. **b)** P = 1 bar: K = K_y = 6.1584 → resolver K(T) = 6.1584 ⇒ **T = 399.5 K**.
 7. **c)** P = 100 bar, GI: K = K_y·(100)⁻¹ = 0.061584 ⇒ **T = 577.6 K**.
-8. **d)** Solución ideal: K = K_φ·K_y/100, K_φ = φ_NH₃/(φ_N₂^½ φ_H₂^3/2), φ a (T, 100 bar) → iterar T:
-   en T = 584.5 K: φ_NH₃ = 0.9251, φ_N₂ = 1.0335, φ_H₂ = 1.0213 ⇒ K_φ = 0.8817 ⇒ K = 0.05430 ⇒ **T = 584.5 K**.
+8. **d)** Solución ideal (convención de la maestra): K_y = K·(P/P°)·K_φ ⇒ K requerida = K_y/(100·K_φ), K_φ = φ_NH₃/(φ_N₂^½ φ_H₂^3/2), φ a (T, 100 bar) → iterar T:
+   en T = 570.4 K: φ_NH₃ = 0.9173, φ_N₂ = 1.0334, φ_H₂ = 1.0217 ⇒ K_φ = 0.8737 ⇒ K = 0.06158/0.8737 = 0.07048 ⇒ **T = 570.4 K** (resultado oficial).
 
-> **⚠ Nota d):** con K_φ < 1 la K requerida es MENOR que en c) ⇒ T_d > T_c (la no idealidad favorece al NH₃ a alta P, como se sabe del proceso Haber). Tu compañero también obtuvo d) > c). El 568.6 K de la clave se reproduce **exacto** si (1) K_φ se aplica **invertido** (K_y = K·P·K_φ en vez de ÷K_φ; eso solo da 570.4 K) y además (2) se omite el término ω·B¹ en ln φ (ln φ = P_r/T_r·B⁰): 568.6 K. Contrasté φ_NH₃ con Lee-Kesler (Tablas E.13/E.14): 0.927 vs 0.925 de Pitzer, así que el método de φ no explica la diferencia. **Vale la pena preguntarle a la maestra qué convención quiere.** Para c) tu compañero (551 K) está mal: la clave y el código coinciden en 577.6 K.
+> **Nota d):** el 568.6 K de la clave es el mismo cálculo omitiendo el término ω·B¹ en ln φ (ln φ = P_r/T_r·B⁰); la diferencia (1.8 K) es solo ese término. La convención **rigurosa** (f̂_i = φ_i y_i P, SVA 13.28: K_y = K·P/K_φ) da **584.5 K** > T_c: con K_φ < 1 la K requerida es menor y la no idealidad favorece al NH₃ (proceso Haber). Queda disponible con `convencion_Kphi="rigurosa"`; el script y los tests reportan ambas. φ_NH₃ por Lee-Kesler (Tablas E.13/E.14) es 0.927 vs 0.925 de Pitzer, así que el método de φ no explica la diferencia entre convenciones. Para c) tu compañero (551 K) está mal: la clave y el código coinciden en 577.6 K.
 
 ## Problema 2 — A(l) → B(l) con Margules
 
@@ -101,9 +103,11 @@ Base 1 mol de combustible (0.94 CH₄, 0.06 N₂).
 1. Escribe reacciones balanceadas y ν; δ = Σν (sólo especies gas).
 2. Tabla en ξ (o balance atómico si te dan la salida); comprueba balance de C, H, O, N.
 3. ¿Qué te piden? y a T dada → resolver ξ; T para y objetivo → K_y fijo, resolver K(T).
-4. ¿Gas ideal, solución ideal (φ puro) o líquido (γ)? Escribe K = K_φ K_y (P/P°)^δ o K = Π(xγ)^ν.
+4. ¿Gas ideal, solución ideal (φ puro) o líquido (γ)? Escribe K = F·K_y·(P/P°)^δ (F = 1/K_φ con la convención de la maestra, `core/convenciones.py`) o K = Π(xγ)^ν.
 5. Energía: base de cálculo, T de cada corriente, trayectoria por 298.15 K, ΔH°298 por reacción, ΔH°_R (signo −), ΔH°_P.
 6. Corre el script/plantilla y verifica que **todos los checks den PASS** y que la tendencia física tenga sentido.
 
-Plantillas: `plantilla/plantilla_ejercicio.py` (equilibrio, barrido de T) y
+Plantillas: `plantilla/plantilla_ejercicio.py` (equilibrio, barrido de T;
+`fugacidad="lewis"` opcional), `plantilla/plantilla_presion_fugacidad.py`
+(1 reacción gas: y a (T, P) o T para y objetivo, gi | Lewis-Randall) y
 `plantilla/plantilla_balance_energia.py` (Q, T_ad, HHV/LHV).

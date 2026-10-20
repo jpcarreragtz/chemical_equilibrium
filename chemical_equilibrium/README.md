@@ -15,6 +15,7 @@ chemical_equilibrium/
 │   ├── reactions.py             # parser: "C3H8 + 3 H2O = 3 CO + 7 H2" -> nu
 │   ├── thermo.py                # Cp/R (C.1), ec. 13.18, Van't Hoff, carga del JSON
 │   ├── nonideal.py              # phi de Pitzer (virial), gammas de Wilson y Margules, K_phi (Lewis-Randall)
+│   ├── convenciones.py          # ÚNICO lugar que decide cómo entra K_phi: "maestra" (default) | "rigurosa"
 │   ├── energia.py               # 2do parcial: balance de energía con reacción, HHV/LHV, T flama adiabática
 │   ├── exercise.py              # motor de plantilla: run_exercise(...)
 │   └── selfcheck.py             # 12 puntos de autovalidación (validate, sweep)
@@ -26,7 +27,8 @@ chemical_equilibrium/
 │   ├── tests.py                 # casos a–n con respuesta conocida (exit 0 = PASS)
 │   └── main.py                  # suite original de 4 casos del curso
 ├── plantilla/
-│   ├── plantilla_ejercicio.py   # copia esto para cada ejercicio nuevo (equilibrio)
+│   ├── plantilla_ejercicio.py   # copia esto para cada ejercicio nuevo (equilibrio; fugacidad="lewis" opcional)
+│   ├── plantilla_presion_fugacidad.py  # 1 reacción gas: y a (T, P) o T para y objetivo, gi | Lewis-Randall
 │   └── plantilla_balance_energia.py  # Q / T flama adiabática / HHV-LHV (2do parcial)
 ├── ejercicios/                  # tareas/clase: ej2, sesión 9, sesión 15, ...
 ├── notebooks/                   # estudio (00_teoria) y versión-reporte (ej2_reporte); NO canónicos
@@ -96,6 +98,23 @@ python3 tests/tests.py     # o: cd tests && python3 tests.py
 Ambas formas funcionan (cada script ejecutable inserta la raíz del
 proyecto en `sys.path` con un bloque `pathlib ... parents[N]`). Exit 0 =
 todos los casos a–n PASS. `tests/main.py` corre la suite original (4/4).
+
+## Convención de K_phi (fugacidad en fase gas)
+
+`core/convenciones.py` es el ÚNICO lugar donde se decide de qué lado entra
+K_phi = Π phi_i^ν (phi_i de especie pura a T, P; Lewis-Randall, Pitzer):
+
+| `CONVENCION_KPHI` | fórmula | Problema 1 d) |
+|---|---|---|
+| `"maestra"` (**default**, la que pide la profesora) | K = K_y·(P/P°)^δ / K_phi  ⇔  K_y = K·(P/P°)^(−δ)·K_phi | 570.4 K |
+| `"rigurosa"` (f̂_i = φ_i y_i P, SVA ec. 13.28) | K = K_phi·K_y·(P/P°)^δ  ⇔  K_y = K·(P/P°)^(−δ)/K_phi | 584.5 K |
+
+Ambas se escriben K = F·K_y·(P/P°)^δ con F = `factor_Kphi(K_phi, convencion)`
+y el solver ideal recibe `K_efectiva(K, K_phi, convencion)` = K/F.
+`run_exercise(..., fugacidad="lewis", convencion_Kphi=None)` y
+`plantilla_presion_fugacidad.py` la usan; cualquier script puede forzar la
+otra con `convencion_Kphi="rigurosa"`. Para cambiar el default del proyecto
+edita solo `CONVENCION_KPHI`.
 
 ## Convenciones
 
