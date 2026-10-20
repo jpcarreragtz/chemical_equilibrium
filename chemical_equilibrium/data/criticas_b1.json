@@ -1,0 +1,24 @@
+{
+  "_meta": {
+    "descripcion": "Propiedades críticas y factor acéntrico (Tabla B.1, Smith–Van Ness–Abbott 7a ed.) para phi por la virial generalizada de Pitzer (core.nonideal.phi_pitzer).",
+    "unidades": {"Tc": "K", "Pc": "bar", "omega": "adimensional"},
+    "estado": "NH3 (405.7 K, 112.8 bar, 0.253) cotejado contra el Ejemplo 3.x del PDF de SVA; C2H4/H2O/EtOH iguales a los usados y validados en la Sesión 15; el resto transcrito de la Tabla B.1 — si en el examen tu tabla difiere, edita aquí.",
+    "fecha": "2026-10-20"
+  },
+  "CH4":   {"nombre": "metano",               "Tc": 190.6, "Pc": 45.99,  "omega": 0.012},
+  "C2H6":  {"nombre": "etano",                "Tc": 305.3, "Pc": 48.72,  "omega": 0.100},
+  "C3H8":  {"nombre": "propano",              "Tc": 369.8, "Pc": 42.48,  "omega": 0.152},
+  "C4H10": {"nombre": "n-butano",             "Tc": 425.1, "Pc": 37.96,  "omega": 0.200},
+  "C2H4":  {"nombre": "etileno",              "Tc": 282.3, "Pc": 50.40,  "omega": 0.087},
+  "C3H6":  {"nombre": "propileno",            "Tc": 365.6, "Pc": 46.65,  "omega": 0.140},
+  "CH4O":  {"nombre": "metanol",              "Tc": 512.6, "Pc": 80.97,  "omega": 0.564},
+  "C2H6O": {"nombre": "etanol",               "Tc": 513.9, "Pc": 61.48,  "omega": 0.645},
+  "H2":    {"nombre": "hidrógeno",            "Tc": 33.19, "Pc": 13.13,  "omega": -0.216},
+  "N2":    {"nombre": "nitrógeno",            "Tc": 126.2, "Pc": 34.00,  "omega": 0.038},
+  "O2":    {"nombre": "oxígeno",              "Tc": 154.6, "Pc": 50.43,  "omega": 0.022},
+  "CO":    {"nombre": "monóxido de carbono",  "Tc": 132.9, "Pc": 34.99,  "omega": 0.048},
+  "CO2":   {"nombre": "dióxido de carbono",   "Tc": 304.2, "Pc": 73.83,  "omega": 0.224},
+  "H2O":   {"nombre": "agua",                 "Tc": 647.1, "Pc": 220.55, "omega": 0.345},
+  "NH3":   {"nombre": "amoniaco",             "Tc": 405.7, "Pc": 112.80, "omega": 0.253},
+  "Cl2":   {"nombre": "cloro",                "Tc": 417.2, "Pc": 77.10,  "omega": 0.069}
+}

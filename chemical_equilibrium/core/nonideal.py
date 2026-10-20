@@ -30,7 +30,7 @@ from __future__ import annotations
 
 import warnings
 from math import exp, log
-from typing import Dict, Tuple
+from typing import Dict, Optional, Tuple
 
 R_CAL = 1.987          # cal/(mol·K) — para los a_ij de Wilson (DECHEMA)
 
@@ -87,3 +87,72 @@ def wilson_gamma_inf(T: float, V1: float, V2: float, a12: float,
     ln g2_inf = 1 - ln L21 - L12 (forma cerrada, para verificación)."""
     L12, L21 = wilson_lambdas(T, V1, V2, a12, a21)
     return exp(1.0 - log(L12) - L21), exp(1.0 - log(L21) - L12)
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# 2do parcial: Margules (EQ. Físico) y regla de Lewis-Randall para K_phi
+# ════════════════════════════════════════════════════════════════════════════
+
+def margules_gamma(x1: float, A12: float, A21: Optional[float] = None
+                   ) -> Tuple[float, float]:
+    """(gamma1, gamma2) por Margules.
+
+    2 parámetros:  G^E/RT = x1·x2·(A21·x1 + A12·x2)
+        ln g1 = x2²·[A12 + 2(A21 − A12)·x1]
+        ln g2 = x1²·[A21 + 2(A12 − A21)·x2]
+    1 parámetro (A21 = None → A21 = A12 = A):  G^E/RT = A·x1·x2
+        ln g1 = A·x2²      ln g2 = A·x1²
+    Límites: g_i → 1 cuando x_i → 1;  ln g1_inf = A12, ln g2_inf = A21."""
+    if not 0.0 <= x1 <= 1.0:
+        raise ValueError(f"x1 = {x1} fuera de [0, 1]")
+    if A21 is None:
+        A21 = A12
+    x2 = 1.0 - x1
+    ln_g1 = x2 * x2 * (A12 + 2.0 * (A21 - A12) * x1)
+    ln_g2 = x1 * x1 * (A21 + 2.0 * (A12 - A21) * x2)
+    return exp(ln_g1), exp(ln_g2)
+
+
+def margules_GE_RT(x1: float, A12: float, A21: Optional[float] = None) -> float:
+    """G^E/RT = x1·x2·(A21·x1 + A12·x2)."""
+    if A21 is None:
+        A21 = A12
+    x2 = 1.0 - x1
+    return x1 * x2 * (A21 * x1 + A12 * x2)
+
+
+def cargar_criticas(especies, ruta=None) -> Dict[str, Tuple[float, float, float]]:
+    """{especie: (Tc [K], Pc [bar], omega)} desde data/criticas_b1.json."""
+    import json
+    from . import DATA
+    ruta = ruta or str(DATA / "criticas_b1.json")
+    with open(ruta, encoding="utf-8") as f:
+        tab = json.load(f)
+    faltan = [sp for sp in especies if sp not in tab]
+    if faltan:
+        raise KeyError(f"Sin Tc/Pc/omega en criticas_b1.json: {faltan} "
+                       f"(agrégalas de la Tabla B.1 de SVA)")
+    return {sp: (tab[sp]["Tc"], tab[sp]["Pc"], tab[sp]["omega"])
+            for sp in especies}
+
+
+def K_phi_lewis(nu: Dict[str, float], T: float, P: float,
+                criticas: Dict[str, Tuple[float, float, float]],
+                avisar: bool = True) -> Tuple[float, Dict[str, dict]]:
+    """K_phi = Π phi_i^nu_i con phi_i de especie PURA a (T, P) — regla de
+    Lewis-Randall = "solución ideal de gases" (SVA sec. 13.7 / Sesión 13):
+
+        K = K_phi · K_y · (P/P°)^δ      →     K_y = K·(P/P°)^(−δ) / K_phi
+
+    Devuelve (K_phi, {especie: dict de phi_pitzer})."""
+    import warnings as _w
+    detalle = {}
+    with _w.catch_warnings():
+        if not avisar:
+            _w.simplefilter("ignore")
+        for sp in nu:
+            detalle[sp] = phi_pitzer(T, P, *criticas[sp])
+    Kphi = 1.0
+    for sp, v in nu.items():
+        Kphi *= detalle[sp]["phi"] ** v
+    return Kphi, detalle
