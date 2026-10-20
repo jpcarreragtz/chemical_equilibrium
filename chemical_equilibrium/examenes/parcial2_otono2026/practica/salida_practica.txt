@@ -1,0 +1,224 @@
+
+########################################################################
+# p1_amoniaco_presion.py
+########################################################################
+========================================================================
+  PROBLEMA 1 — 1/2 N2 + 3/2 H2 -> NH3  (alimentación estequiométrica)
+========================================================================
+
+0) DATOS TERMO (Tablas C.1/C.4 SVA)
+   ΔH°298 = -46110 J/mol   ΔG°298 = -16450 J/mol   K298 = 762.21
+   ΔA = -2.9355  ΔB = 2.0905e-03  ΔC = 0.0e+00  ΔD = -3.3050e+04
+   δ = Σν = -1  → K = K_phi·K_y·(P/P°)^δ
+
+a) T = 300 K, P = 1 bar, gas ideal
+   K(300) = 679.572   (ln K = 6.5215)
+   ξ/(2−ξ) ... resuelve K_y(ξ) = K → ξ = 0.966362,  n_T = 1.033638
+  | especie   |      n_i |      y_i |
+  |-----------|----------|----------|
+  | NH3       | 0.96636  | 0.93491  |
+  | N2        | 0.016819 | 0.016271 |
+  | H2        | 0.050456 | 0.048814 |
+   → y_NH3 = 0.9349     (maestra 0.9349)
+
+   Para y_NH3 = 0.50: ξ = 0.6667, y_N2 = 0.125, y_H2 = 0.375, K_y = 6.1584
+
+b) P = 1 bar, gas ideal: K requerida = K_y·(1)^(-1) = 6.1584
+   → T = 399.50 K     (maestra 399.5 K)
+
+c) P = 100 bar, gas ideal: K requerida = K_y/100 = 0.06158
+   → T = 577.64 K     (maestra 577.6 K; compañero 551.0 K)
+
+d) P = 100 bar, SOLUCIÓN IDEAL (Lewis-Randall, φ_i puro, Pitzer)
+  | esp   |     Tc |     Pc |      ω |      Tr |      Pr |        B0 |      B1 |       φ | Vr≥2   |
+  |-------|--------|--------|--------|---------|---------|-----------|---------|---------|--------|
+  | NH3   | 405.7  | 112.8  |  0.253 |  1.4408 | 0.88652 | -0.15226  | 0.1019  | 0.92513 | NO*    |
+  | N2    | 126.2  |  34    |  0.038 |  4.6318 | 2.9412  |  0.046682 | 0.13872 | 1.0335  | NO*    |
+  | H2    |  33.19 |  13.13 | -0.216 | 17.612  | 7.6161  |  0.078714 | 0.139   | 1.0213  | sí     |
+   K_phi = φ_NH3/(φ_N2^½ φ_H2^3/2) = 0.88170
+   K requerida = K_phi·K_y/100 = 0.05430  = K(584.53 K) = 0.05430
+   → T = 584.53 K   (maestra 568.6 K; compañero 557.0 K)
+
+   NOTA sobre d)  (DISCREPANCIA CON LA CLAVE)
+   * φ_NH3 < 1 y φ_N2, φ_H2 > 1  → K_phi < 1 → se necesita una K MENOR
+     que en c) → T_d > T_c. Físicamente: la no idealidad a 100 bar
+     FAVORECE al NH3 (por eso T_d = 584.5 K > T_c = 577.6 K).
+   * Si K_phi se aplica INVERTIDO (K_y = K·P·K_phi en vez de ÷K_phi)
+     sale T = 570.4 K ≈ clave de la maestra (568.6 K).
+   * Invertido Y sin el término ω·B1 (ln φ = Pr/Tr·B0) sale T = 568.6 K = clave exacta.
+     → la clave combina 2 cosas: K_phi del lado equivocado (~14 K) y omitir ω·B1 (~2 K).
+   * φ_NH3 por Lee-Kesler (Tablas E.13/E.14) a Tr = 1.441, Pr = 0.887: 0.9269
+     vs Pitzer 0.9251 → el método de φ NO explica la diferencia.
+   * Vr < 2 para NH3 y N2: la virial está en el borde de validez
+     (warning de SVA Fig. 3.14); es lo que se ve en clase (Sesión 13).
+
+AUTOVALIDACIÓN
+  [PASS] b) re-resolviendo a T = 399.50 K: y_NH3 = 0.50000000
+  [PASS] c) re-resolviendo a T = 577.64 K: y_NH3 = 0.50000000
+  [PASS] d) re-resolviendo a T = 584.53 K: y_NH3 = 0.50000000
+  [PASS] balance atómico a): N = 1.000000000000 (1), H = 3.000000000000 (3)
+  [PASS] a) vs clave: 0.9349 vs 0.9349
+  [PASS] b) vs clave: 399.4993 vs 399.5
+  [PASS] c) vs clave: 577.6395 vs 577.6
+  [PASS] tendencia física d) > c) (584.5 > 577.6 K)
+  [info] d) clave 568.6 K ≠ 584.5 K: ver NOTA (K_phi invertido)
+
+VEREDICTO: OK
+
+########################################################################
+# p2_isomerizacion_margules.py
+########################################################################
+========================================================================
+  PROBLEMA 2 — A(l) -> B(l), Margules G^E/RT = 0.1 x_A x_B
+========================================================================
+
+1) ln K = −ΔG°/RT = 1000/(8.314·298.15) = 0.40342  → K = 1.49693
+2) Margules: A12 = 0.1, A21 = 0.1  (1 parámetro)
+   ln γA = A·xB²,  ln γB = A·xA²
+
+3) NO IDEAL (actividades):
+   x_A = 0.3955   x_B = 0.6045
+   γ_A = 1.03722   γ_B = 1.01576   G^E/RT = 0.02391
+   comprobación: x_Bγ_B/(x_Aγ_A) = 1.49693 = K
+   (maestra a) x_A = 0.3955)
+
+4) SOLUCIÓN IDEAL (γ = 1):  x_A = 1/(1 + K)
+   x_A = 0.4005   x_B = 0.5995   (maestra b) x_A = 0.4005)
+
+5) Error al suponer solución ideal: (x_A,id − x_A)/x_A = +1.27 %  (en x_B: -0.83 %)
+
+AUTOVALIDACIÓN
+  [PASS] a) 0.39548 vs clave 0.3955
+  [PASS] b) 0.40049 vs clave 0.4005
+  [PASS] residual ln K_calc − ln K = -1.7e-16
+  [PASS] límites γ_i → 1 cuando x_i → 1
+
+VEREDICTO: OK
+
+########################################################################
+# p3_gas_natural_hhv.py
+########################################################################
+========================================================================
+  PROBLEMA 3 — ΔH°c de gases naturales (H2O líquida → HHV)
+========================================================================
+
+1) ΔH°c de cada combustible (ley de Hess, ΔH°f de la Tabla C.4)
+  | reacción                        |   ΔH°c H2O(l) kJ/mol |   ΔH°c H2O(g) kJ/mol |
+  |---------------------------------|----------------------|----------------------|
+  | 1 CH4 + 2 O2 → 1 CO2 + 2 H2O    |              -890.65 |              -802.62 |
+  | 1 C2H6 + 3.5 O2 → 2 CO2 + 3 H2O |             -1560.7  |             -1428.7  |
+  | 1 C3H8 + 5 O2 → 3 CO2 + 4 H2O   |             -2219.2  |             -2043.1  |
+   (ΔH°f H2O(l) = -285830 J/mol)
+
+2) EXPRESIÓN GENERAL (kJ/mol de gas natural):
+   ΔH°c = -890.649·y_CH4 + (-1560.688)·y_C2H6 + (-2219.167)·y_C3H8
+
+3) RESULTADOS
+  | inciso   |   y_CH4 |   y_C2H6 |   y_C3H8 |   y_N2 |   ΔH°c kJ/mol |   maestra |   diferencia |
+  |----------|---------|----------|----------|--------|---------------|-----------|--------------|
+  | a        |    0.95 |     0.02 |     0.02 |   0.01 |       -921.71 |   -921.71 |     -0.00365 |
+  | b        |    0.9  |     0.05 |     0.03 |   0.02 |       -946.19 |   -946.16 |     -0.03351 |
+  | c        |    0.85 |     0.07 |     0.03 |   0.05 |       -932.87 |   -923.87 |     -9.0048  |
+
+   → Mayor calor de combustión (|ΔH°c| máximo): inciso b) con -946.19 kJ/mol
+
+   NOTA inciso c) (DISCREPANCIA CON LA CLAVE)
+   0.85(890.649) + 0.07(1560.688) + 0.03(2219.167) = 932.87 kJ/mol
+   La clave −923.87 es −932.87 con los dígitos '3' y '2' intercambiados (error de
+   transcripción; para obtenerla de verdad haría falta y_CH4 ≈ 0.8399).
+   La conclusión no cambia: el gas b) tiene el mayor calor de combustión.
+
+AUTOVALIDACIÓN
+  [PASS] a) -921.71 vs clave -921.71 (tol 0.05 kJ/mol)
+  [PASS] b) -946.19 vs clave -946.16 (tol 0.05 kJ/mol)
+  [PASS] CH4: HHV − LHV = n_H2O·ΔH_lv (2·44 012 J)
+  [PASS] C2H6: HHV − LHV = n_H2O·ΔH_lv (3·44 012 J)
+  [PASS] C3H8: HHV − LHV = n_H2O·ΔH_lv (4·44 012 J)
+  [PASS] a) Σ y_i = 1.0000
+  [PASS] b) Σ y_i = 1.0000
+  [PASS] c) Σ y_i = 1.0000
+  [info] c) -932.87 vs clave -923.87: ver NOTA
+
+VEREDICTO: OK
+
+########################################################################
+# p4_reformado_calor.py
+########################################################################
+========================================================================
+  PROBLEMA 4 — Reformado de CH4 (2 reacciones), Q por mol de producto
+========================================================================
+
+1) BALANCE DE MATERIA (base 1 mol de producto)
+   Alimentación: CH4 = 0.2000 mol, H2O = 0.4000 mol  (relación H2O/CH4 = 2.00)
+   ξ1 = 0.2000   ξ2 = 0.0275   (residual 1.1e-16)
+   Balance atómico (sal − ent): {'C': 2.7755575615628914e-17, 'H': -2.220446049250313e-16, 'O': -1.1102230246251565e-16}
+
+2) BALANCE DE ENERGÍA   Q = ΔH°_R + Σξ·ΔH°298 + ΔH°_P
+   ΔH°298,1 = 205813 J   ΔH°298,2 = -41166 J
+  | término                                     |   J/mol de producto |
+  |---------------------------------------------|---------------------|
+  | ΔH°_R (reactivos 773.15 → 298.15 K)         |              -11455 |
+  | ξ1·ΔH°298,1 + ξ2·ΔH°298,2                   |               40031 |
+  | ΔH°_P (productos 298.15 → 1123.15 K)        |               26305 |
+  | Q = ΔH                                      |               54881 |
+  | Q por entalpías de formación (comprobación) |               54881 |
+   ⟨Cp⟩_H productos = 31.885 J/K
+
+   → Q = 54881 J por mol de gas producido   (maestra 54881 J)
+
+AUTOVALIDACIÓN
+  [PASS] balance atómico cierra
+  [PASS] ξ reproduce la salida (n_sal = n_ent + νξ)
+  [PASS] Q trayectoria = Q formación
+  [PASS] Q vs clave (rtol 1e-4)
+  [PASS] Σ y_salida = 1
+
+VEREDICTO: OK
+
+########################################################################
+# p5_calentador_flujo_gas.py
+########################################################################
+========================================================================
+  PROBLEMA 5 — Calentador de agua: flujo volumétrico de combustible
+========================================================================
+
+1) BALANCE DE MATERIA (base 1 mol de combustible)
+   ξ1 (→CO2) = 0.6580   ξ2 (→CO) = 0.2820
+   O2 alimentado = 1.35·2·0.94 = 2.5380   N2 aire = 9.5477
+  | salida   |    mol |
+  |----------|--------|
+  | O2       | 0.799  |
+  | N2       | 9.6077 |
+  | CO2      | 0.658  |
+  | H2O      | 1.88   |
+  | CO       | 0.282  |
+   Balance atómico: {'C': 0.0, 'H': 0.0, 'N': 0.0, 'O': 0.0}
+
+2) BALANCE DE ENERGÍA DEL LADO DE LOS GASES (por mol de combustible)
+  | término                               |    J/mol comb. |
+  |---------------------------------------|----------------|
+  | ΔH°_R (entradas a 298.15 K)           |     0          |
+  | ΔH°298,1 = -802625 J                  |    -5.2813e+05 |
+  | ΔH°298,2 = -519641 J                  |    -1.4654e+05 |
+  | ΔH°_P (298.15 → 483.15 K)             | 75412          |
+  | ΔH gases = Q                          |    -5.9925e+05 |
+  | comprobación (entalpías de formación) |    -5.9925e+05 |
+   Calor transferido al agua = −ΔH = 599254 J/mol de combustible
+
+3) LADO DEL AGUA
+   ṁ = 75 lbm/s = 34.0194 kg/s;  T: 25.00 → 95.00 °C
+   h_l(25 °C) = 104.83, h_l(95 °C) = 398.09 kJ/kg  → Δh = 293.26 kJ/kg
+   Q_agua = 9976.5 kW
+
+4) FLUJO DE COMBUSTIBLE
+   ṅ = Q_agua/(−ΔH) = 16.6483 mol/s
+   V̇ = ṅRT/P (77 °F, 1 atm) = 0.4073 m³/s = 14.38 ft³/s   (maestra 0.407 m³/s)
+   [sensibilidad] con Cp_agua = 4.184 kJ/kg·K: V̇ = 0.4068 m³/s
+
+AUTOVALIDACIÓN
+  [PASS] balance atómico cierra
+  [PASS] Q trayectoria = Q formación
+  [PASS] O2 sobrante > 0
+  [PASS] V̇ vs clave (redondeo a 3 cifras)
+
+VEREDICTO: OK

@@ -14,17 +14,20 @@ chemical_equilibrium/
 │   ├── equilibrium.py           # solvers (Método A y Método B), K<->Kc, checks
 │   ├── reactions.py             # parser: "C3H8 + 3 H2O = 3 CO + 7 H2" -> nu
 │   ├── thermo.py                # Cp/R (C.1), ec. 13.18, Van't Hoff, carga del JSON
-│   ├── nonideal.py              # phi de Pitzer (virial), gammas de Wilson
+│   ├── nonideal.py              # phi de Pitzer (virial), gammas de Wilson y Margules, K_phi (Lewis-Randall)
+│   ├── energia.py               # 2do parcial: balance de energía con reacción, HHV/LHV, T flama adiabática
 │   ├── exercise.py              # motor de plantilla: run_exercise(...)
 │   └── selfcheck.py             # 12 puntos de autovalidación (validate, sweep)
 ├── data/
 │   ├── sva_tables.json          # Smith–Van Ness C.1/C.4, 42 especies verificadas
+│   ├── criticas_b1.json         # Tc, Pc, ω (Tabla B.1) para phi de Pitzer
 │   └── raw/                     # (fotos/pdf de tablas originales; fuera de git)
 ├── tests/
-│   ├── tests.py                 # casos a–l con respuesta conocida (exit 0 = PASS)
+│   ├── tests.py                 # casos a–n con respuesta conocida (exit 0 = PASS)
 │   └── main.py                  # suite original de 4 casos del curso
 ├── plantilla/
-│   └── plantilla_ejercicio.py   # copia esto para cada ejercicio nuevo
+│   ├── plantilla_ejercicio.py   # copia esto para cada ejercicio nuevo (equilibrio)
+│   └── plantilla_balance_energia.py  # Q / T flama adiabática / HHV-LHV (2do parcial)
 ├── ejercicios/                  # tareas/clase: ej2, sesión 9, sesión 15, ...
 ├── notebooks/                   # estudio (00_teoria) y versión-reporte (ej2_reporte); NO canónicos
 │   └── entrega_s15/             # entregable de la sesión 15
@@ -32,6 +35,7 @@ chemical_equilibrium/
 │   ├── parcial1_otono2026/      # parcial1_p1/p2/p3.py (ejecutables)
 │   │   ├── entrega_parcial1/    # CONGELADA: evidencia entregada el 15/09/2026
 │   │   └── preliminares/        # versiones previas del mismo parcial (históricas)
+│   ├── parcial2_otono2026/practica/  # 5 ejercicios adicionales del 2do parcial + GUIA_planteamientos.md
 │   └── primavera2026/           # o-cresol, n-butano→anhídrido maleico, pirólisis
 └── salidas/                     # CSV/PNG regenerables (default de run_exercise)
 ```
@@ -91,7 +95,7 @@ python3 tests/tests.py     # o: cd tests && python3 tests.py
 
 Ambas formas funcionan (cada script ejecutable inserta la raíz del
 proyecto en `sys.path` con un bloque `pathlib ... parents[N]`). Exit 0 =
-todos los casos a–l PASS. `tests/main.py` corre la suite original (4/4).
+todos los casos a–n PASS. `tests/main.py` corre la suite original (4/4).
 
 ## Convenciones
 
