@@ -12,9 +12,11 @@ __pycache__/
 
 # Material con derechos de autor (libro y apéndices en PDF) y fotos de tablas
 *.pdf
+# Fotos de tablas/cartas de libros (derechos de autor)
+Tablas y Valores/**/*.jpg
 **/data/raw/
 
-# Carpeta original de la base de datos (versionada como tablas_sva/)
+# Carpeta original de la base de datos (versionada como "Tablas y Valores/tablas_sva/")
 Tablas SVA/
 
 # Editor
