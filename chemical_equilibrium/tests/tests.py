@@ -13,6 +13,9 @@ Casos:
   g) K(T) por ec. 13.18 (datos SVA) vs las K del curso para el reformado
   h) Independencia de la semilla inicial del solver
   i) Parser de reacciones (fórmulas, coeficientes, balance)
+  ... j–l) ver cada función
+  m) Energía/combustión: HHV/LHV, T flama CH4 (SVA 4.7), Problemas 3–5 del 2do parcial
+  n) Presión/no idealidad: Problema 1 (NH3, Lewis-Randall) y 2 (Margules)
 """
 
 from __future__ import annotations
@@ -361,9 +364,105 @@ def caso_l():
     check("gamma2_inf numérica vs cerrada", g2i_num, g2i, rtol=1e-6)
 
 
+# ---------------------------------------------------------------- caso m
+def caso_m():
+    head("m) Energía/combustión (core.energia): SVA ej. 4.7 y Problemas 3–5")
+    import warnings as _w
+    from core.energia import (T_salida_para_Q, balance_energia,
+                              calor_combustion, combustion_mezcla,
+                              alimentacion_por_atomos, avances_desde_flujos,
+                              h_liquido_sat)
+    # ΔH°c por ley de Hess (H2O líquida) contra valores de SVA/slides
+    check("HHV CH4 (kJ/mol)", calor_combustion("CH4")["HHV"] / 1000,
+          890.649, rtol=1e-6)
+    check("LHV CH4 (kJ/mol)", calor_combustion("CH4")["LHV"] / 1000,
+          802.625, rtol=1e-6)
+    check("HHV H2 (slide: 285.8)", calor_combustion("H2")["HHV"] / 1000,
+          285.83, rtol=1e-4)
+    check("ΔH°c CO (slide: −283.0)", calor_combustion("CO")["dHc_l"] / 1000,
+          -282.984, rtol=1e-5)
+    # Problema 3 a) y b)
+    check("P3 a) ΔH°c (kJ/mol)", combustion_mezcla(
+        {"CH4": .95, "C2H6": .02, "C3H8": .02, "N2": .01})["dHc_l"] / 1000,
+        -921.71, atol=0.01)
+    check("P3 b) ΔH°c (kJ/mol)", combustion_mezcla(
+        {"CH4": .90, "C2H6": .05, "C3H8": .03, "N2": .02})["dHc_l"] / 1000,
+        -946.16, atol=0.05)
+    # SVA ej. 4.7 / Sesión 18 ej. 1: T flama CH4, 20 % exceso → 2066 K
+    with _w.catch_warnings():
+        _w.simplefilter("ignore")
+        N2 = 2.4 * 79 / 21
+        T = T_salida_para_Q([({"CH4": 1, "O2": 2.4, "N2": N2}, 298.15)],
+                            {"CO2": 1, "H2O": 2, "O2": 0.4, "N2": N2},
+                            ["CH4 + 2 O2 = CO2 + 2 H2O"], [1.0])
+    check("T flama adiabática CH4 20 % exceso (K)", T, 2066.0, atol=1.0)
+    # Problema 4: Q = 54 881 J por mol de producto
+    sal = {"CO2": .0275, "CO": .1725, "H2O": .1725, "H2": .6275}
+    rx = ["CH4 + H2O = CO + 3 H2", "CO + H2O = CO2 + H2"]
+    alim = alimentacion_por_atomos(sal, ["CH4", "H2O"])
+    xi, _ = avances_desde_flujos(alim, sal, rx)
+    b = balance_energia([(alim, 773.15)], sal, 1123.15, rx, xi)
+    check("P4 Q (J)", b["Q"], 54881.0, rtol=1e-4)
+    check("P4 Q trayectoria vs formación", b["Q"] - b["Q_formacion"], 0.0,
+          atol=1e-6)
+    # Problema 5: V = 0.407 m³/s
+    xi5 = [0.7 * 0.94, 0.3 * 0.94]
+    O2 = 1.35 * 2 * 0.94
+    aire = {"O2": O2, "N2": O2 * 79 / 21}
+    sal5 = {"CO2": xi5[0], "CO": xi5[1], "H2O": 1.88,
+            "O2": O2 - 2 * xi5[0] - 1.5 * xi5[1], "N2": 0.06 + aire["N2"]}
+    b5 = balance_energia([({"CH4": .94, "N2": .06}, 298.15), (aire, 298.15)],
+                         sal5, 483.15, ["CH4 + 2 O2 = CO2 + 2 H2O",
+                                        "CH4 + 3/2 O2 = CO + 2 H2O"], xi5)
+    dh = h_liquido_sat(95.0) - h_liquido_sat(25.0)
+    V = 75 * 0.45359237 * dh * 1000 / (-b5["Q"]) * R_J * 298.15 / 101325
+    check("P5 V (m³/s)", V, 0.407, atol=6e-4)
+
+
+# ---------------------------------------------------------------- caso n
+def caso_n():
+    head("n) Presión/no idealidad 2do parcial: Problemas 1 y 2")
+    from math import log
+    from scipy.optimize import brentq
+    from core.nonideal import K_phi_lewis, cargar_criticas, margules_gamma
+    nu = {"NH3": 1.0, "N2": -0.5, "H2": -1.5}
+    d = {k: DATOS_SVA[k] for k in nu}
+    lnK = lambda T: log(reaction_thermo(nu, d, T)["K"])
+    Ky = lambda x: (x / (2 - x)) / ((0.5 * (1 - x) / (2 - x)) ** 0.5
+                                    * (1.5 * (1 - x) / (2 - x)) ** 1.5)
+    xi = brentq(lambda x: log(Ky(x)) - lnK(300.0), 1e-12, 1 - 1e-12)
+    check("P1 a) y_NH3 (300 K, 1 bar)", xi / (2 - xi), 0.9349, atol=1e-4)
+    ky = Ky(2 / 3)
+    check("P1 b) T (K)", brentq(lambda T: lnK(T) - log(ky), 300, 1500),
+          399.5, atol=0.1)
+    check("P1 c) T (K)", brentq(lambda T: lnK(T) - log(ky / 100), 300, 1500),
+          577.6, atol=0.1)
+    crit = cargar_criticas(list(nu))
+    Td = brentq(lambda T: lnK(T) - log(K_phi_lewis(nu, T, 100.0, crit,
+                                                     avisar=False)[0]
+                                       * ky / 100), 300, 1500)
+    ok = Td > 577.6
+    print(f"  [{'PASS' if ok else 'FAIL'}] P1 d) Lewis-Randall: T = {Td:.1f}"
+          f" K > T_c (no idealidad favorece NH3; clave 568.6 K, ver p1)")
+    if not ok:
+        FALLAS.append("P1 d tendencia")
+    # Problema 2: Margules 1 parámetro
+    K = exp(1000.0 / (R_J * 298.15))
+    def F(x):
+        gA, gB = margules_gamma(x, 0.1)
+        return log((1 - x) * gB / (x * gA)) - log(K)
+    check("P2 a) x_A (Margules)", brentq(F, 1e-9, 1 - 1e-9), 0.3955,
+          atol=6e-5)
+    check("P2 b) x_A (ideal)", 1 / (1 + K), 0.4005, atol=6e-5)
+    g1, g2 = margules_gamma(0.0, 0.5, 1.2)
+    check("Margules 2 par.: ln γ1∞ = A12", log(g1), 0.5, rtol=1e-12)
+    g1, g2 = margules_gamma(1.0, 0.5, 1.2)
+    check("Margules 2 par.: ln γ2∞ = A21", log(g2), 1.2, rtol=1e-12)
+
+
 if __name__ == "__main__":
     for f in (caso_a, caso_b, caso_c, caso_d, caso_e, caso_f, caso_g,
-              caso_h, caso_i, caso_j, caso_k, caso_l):
+              caso_h, caso_i, caso_j, caso_k, caso_l, caso_m, caso_n):
         f()
     print(f"\n{'=' * 72}")
     if FALLAS:
