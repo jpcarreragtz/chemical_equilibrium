@@ -14,7 +14,7 @@ Casos:
   h) Independencia de la semilla inicial del solver
   i) Parser de reacciones (fórmulas, coeficientes, balance)
   ... j–l) ver cada función
-  m) Energía/combustión: HHV/LHV, T flama CH4 (SVA 4.7), Problemas 3–5 del 2do parcial
+  m) Energía/combustión: HHV/LHV, T flama CH4 (SVA 4.7), Problemas 3–5 del 2do parcial, Dulong
   n) Presión/no idealidad: Problema 1 (NH3, Lewis-Randall con las dos
      convenciones de K_phi de core/convenciones.py, run_exercise con
      fugacidad="lewis") y 2 (Margules)
@@ -419,6 +419,24 @@ def caso_m():
     dh = h_liquido_sat(95.0) - h_liquido_sat(25.0)
     V = 75 * 0.45359237 * dh * 1000 / (-b5["Q"]) * R_J * 298.15 / 101325
     check("P5 V (m³/s)", V, 0.407, atol=6e-4)
+    # Ecuación de Dulong — columna "Coal" de la tabla de la Sesión 17 (daf):
+    # C 0.8294, H 0.0262, O 0.0933, S 0.01. A mano:
+    #   HHV = 33.9(0.8294) + 144.2(0.0262 − 0.0933/8) + 9.4(0.01)
+    #       = 28.11666 + 2.0963075 + 0.094 = 30.3069675 MJ/kg
+    #   LHV = 30.3069675 − 2.442·9·0.0262 = 29.7311439 MJ/kg
+    from core.energia import hhv_dulong
+    dl = hhv_dulong(0.8294, 0.0262, 0.0933, 0.01)
+    check("Dulong Coal HHV (MJ/kg)", dl["HHV"], 30.3069675, rtol=1e-9)
+    check("Dulong Coal LHV (MJ/kg)", dl["LHV"], 29.7311439, rtol=1e-9)
+    check("Dulong Coal HHV (kJ/kg)", hhv_dulong(0.8294, 0.0262, 0.0933, 0.01,
+                                                base="kJ/kg")["HHV"],
+          30306.9675, rtol=1e-9)
+    try:
+        hhv_dulong(82.94, 2.62, 9.33, 1.0)
+        print("  [FAIL] Dulong con porcentajes NO fue rechazado")
+        FALLAS.append("dulong %")
+    except ValueError as e:
+        print(f"  [PASS] Dulong con % rechazado: {str(e)[:55]}...")
 
 
 # ---------------------------------------------------------------- caso n

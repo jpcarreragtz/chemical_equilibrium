@@ -38,6 +38,7 @@ chemical_equilibrium/
 │   │   ├── entrega_parcial1/    # CONGELADA: evidencia entregada el 15/09/2026
 │   │   └── preliminares/        # versiones previas del mismo parcial (históricas)
 │   ├── parcial2_otono2026/practica/  # 5 ejercicios adicionales del 2do parcial + GUIA_planteamientos.md
+│   ├── parcial2_otono2026/simulacro/ # simulacro: 1 problema por tipo, copias de las plantillas (correr_simulacro.py)
 │   └── primavera2026/           # o-cresol, n-butano→anhídrido maleico, pirólisis
 └── salidas/                     # CSV/PNG regenerables (default de run_exercise)
 ```

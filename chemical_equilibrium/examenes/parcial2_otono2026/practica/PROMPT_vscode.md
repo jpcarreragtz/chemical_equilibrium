@@ -11,7 +11,7 @@ Usa SOLO el motor de este repo: `core/thermo.py` (K(T) ec. 13.18 SVA),
 "maestra" → K_y = K·(P/P°)^(−δ)·K_phi; "rigurosa" → ÷K_phi; nunca lo
 decidas en el script),
 `core/energia.py` (balance_energia, T_salida_para_Q, combustion_mezcla,
-alimentacion_por_atomos, avances_desde_flujos, h_liquido_sat) y los datos
+alimentacion_por_atomos, avances_desde_flujos, h_liquido_sat, hhv_dulong) y los datos
 de `data/sva_tables.json` y `data/criticas_b1.json`. Antes de programar,
 escribe el planteamiento a mano (reacciones y ν, δ, tabla en ξ o balance
 atómico, expresión de K o de Q = ΔH°_R + Σ ξ ΔH°298 + ΔH°_P). Luego crea

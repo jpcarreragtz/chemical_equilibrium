@@ -1,0 +1,477 @@
+
+########################################################################
+# a_metanol_presion.py 1
+########################################################################
+========================================================================
+  Simulacro a1) metanol: y_CH3OH a 300 K y 1 bar (gas ideal)
+========================================================================
+
+1) REACCIÓN Y ν:   CO + 2 H2 = CH4O
+   ν = {CO: -1, H2: -2, CH4O: +1}   →   δ = Σν = -2
+   Inertes: (ninguno)
+
+2) TABLA EN ξ (n_i = n_i0 + ν_i·ξ):
+  | especie | n_i0 | ν_i | n_i(ξ)  | y_i(ξ)              |
+  |---------|------|-----|---------|---------------------|
+  | CO      | 1    | -1  | 1 − 1·ξ | (1 − 1·ξ)/(3 − 2·ξ) |
+  | H2      | 2    | -2  | 2 − 2·ξ | (2 − 2·ξ)/(3 − 2·ξ) |
+  | CH4O    | 0    | 1   | 0 + 1·ξ | (0 + 1·ξ)/(3 − 2·ξ) |
+   n_T = 3 − 2·ξ;   ξ ∈ (0, 1)
+   K_y = Π y_i^ν_i = y_CO^(-1) · y_H2^(-2) · y_CH4O^(1)
+   K = F·K_y·(P/P°)^δ,  P/P° = 1
+   Modelo: gas ideal (K_phi = 1, F = 1)
+
+3) K(T) POR LA EC. 13.18 (Tablas C.1/C.4 SVA)
+   ΔH°298 = -90135 J/mol   ΔG°298 = -24791 J/mol   K298 = 2.205e+04
+   ΔA = -7.6630  ΔB = 1.0815e-02  ΔC = -3.4500e-06  ΔD = -1.3500e+04
+
+4) SOLUCIÓN  (modo 'y_a_T', modelo 'gi')
+   T = 300.00 K   P = 1 bar   K(T) = 17620   ΔH°(T) = -90.21 kJ/mol   ΔG°(T) = -24.39 kJ/mol
+   K_y requerida = K·(P/P°)^(−δ)/F = 17620   →   ξ = 0.975206
+  | especie | n_i      | y_i      |
+  |---------|----------|----------|
+  | CO      | 0.024794 | 0.023623 |
+  | H2      | 0.049589 | 0.047246 |
+  | CH4O    | 0.97521  | 0.92913  |
+   n_T = 1.049589
+
+   → y_i a 300.00 K: CO 0.0236, H2 0.0472, CH4O 0.9291
+
+AUTOVALIDACIÓN
+  [PASS] residual ln K_y − [ln K − δ ln(P/P°) − ln F] = 7.1e-15
+  [PASS] Σ y_i = 1.000000000000
+  [PASS] todas las n_i ≥ 0
+  [PASS] balance atómico cierra (máx |Δ| = 0.0e+00)
+  [PASS] contraste con run_exercise (misma T, fugacidad=None): máx |Δy| = 2.2e-16, selfcheck PASS
+
+VEREDICTO: OK
+
+CHEQUEO A MANO (fórmulas del planteamiento, sin la plantilla):
+   1) K(300) = 17620 → ξ = 0.975206 → y_CH3OH = 0.9291
+   2) K_y(ξ = 0.75) = 27.0000 (= 27) → K(T) = 27 → T = 364.47 K
+   3) gas ideal a 100 bar: K(T) = 27/100² → T = 516.48 K
+      Lewis-Randall 'maestra': K(T) = 27/(100²·K_phi) → T = 504.23 K  (K_phi = 0.5773)
+  [PASS] K_y para y = 0.5 vale 27 (planteamiento)
+  [PASS] plantilla y_CH3OH = 0.929131 = a mano 0.929131
+
+RESULTADO a1): y_CH3OH(300 K, 1 bar) = 0.9291
+VEREDICTO SIMULACRO: OK
+
+########################################################################
+# a_metanol_presion.py 2
+########################################################################
+========================================================================
+  Simulacro a2) metanol: T para y_CH3OH = 0.5 a 1 bar (gas ideal)
+========================================================================
+
+1) REACCIÓN Y ν:   CO + 2 H2 = CH4O
+   ν = {CO: -1, H2: -2, CH4O: +1}   →   δ = Σν = -2
+   Inertes: (ninguno)
+
+2) TABLA EN ξ (n_i = n_i0 + ν_i·ξ):
+  | especie | n_i0 | ν_i | n_i(ξ)  | y_i(ξ)              |
+  |---------|------|-----|---------|---------------------|
+  | CO      | 1    | -1  | 1 − 1·ξ | (1 − 1·ξ)/(3 − 2·ξ) |
+  | H2      | 2    | -2  | 2 − 2·ξ | (2 − 2·ξ)/(3 − 2·ξ) |
+  | CH4O    | 0    | 1   | 0 + 1·ξ | (0 + 1·ξ)/(3 − 2·ξ) |
+   n_T = 3 − 2·ξ;   ξ ∈ (0, 1)
+   K_y = Π y_i^ν_i = y_CO^(-1) · y_H2^(-2) · y_CH4O^(1)
+   K = F·K_y·(P/P°)^δ,  P/P° = 1
+   Modelo: gas ideal (K_phi = 1, F = 1)
+
+3) K(T) POR LA EC. 13.18 (Tablas C.1/C.4 SVA)
+   ΔH°298 = -90135 J/mol   ΔG°298 = -24791 J/mol   K298 = 2.205e+04
+   ΔA = -7.6630  ΔB = 1.0815e-02  ΔC = -3.4500e-06  ΔD = -1.3500e+04
+
+4) SOLUCIÓN  (modo 'T_para_y', modelo 'gi')
+   T = 364.47 K   P = 1 bar   K(T) = 27   ΔH°(T) = -92.66 kJ/mol   ΔG°(T) = -9.99 kJ/mol
+   K_y requerida = K·(P/P°)^(−δ)/F = 27   →   ξ = 0.750000
+  | especie | n_i  | y_i     |
+  |---------|------|---------|
+  | CO      | 0.25 | 0.16667 |
+  | H2      | 0.5  | 0.33333 |
+  | CH4O    | 0.75 | 0.5     |
+   n_T = 1.500000
+
+   → T = 364.47 K  para  y_CH4O = 0.5
+
+AUTOVALIDACIÓN
+  [PASS] residual ln K_y − [ln K − δ ln(P/P°) − ln F] = -8.9e-16
+  [PASS] Σ y_i = 1.000000000000
+  [PASS] todas las n_i ≥ 0
+  [PASS] balance atómico cierra (máx |Δ| = 0.0e+00)
+  [PASS] y_CH4O(T = 364.47 K) = 0.5000000000 = objetivo
+  [PASS] contraste con run_exercise (misma T, fugacidad=None): máx |Δy| = 1.1e-16, selfcheck PASS
+
+VEREDICTO: OK
+
+CHEQUEO A MANO (fórmulas del planteamiento, sin la plantilla):
+   1) K(300) = 17620 → ξ = 0.975206 → y_CH3OH = 0.9291
+   2) K_y(ξ = 0.75) = 27.0000 (= 27) → K(T) = 27 → T = 364.47 K
+   3) gas ideal a 100 bar: K(T) = 27/100² → T = 516.48 K
+      Lewis-Randall 'maestra': K(T) = 27/(100²·K_phi) → T = 504.23 K  (K_phi = 0.5773)
+  [PASS] K_y para y = 0.5 vale 27 (planteamiento)
+  [PASS] plantilla T = 364.4713 K = a mano 364.4713 K
+
+RESULTADO a2): T(y = 0.5, 1 bar) = 364.5 K
+VEREDICTO SIMULACRO: OK
+
+########################################################################
+# a_metanol_presion.py 3
+########################################################################
+========================================================================
+  Simulacro a3) metanol: T para y_CH3OH = 0.5 a 100 bar (Lewis-Randall)
+========================================================================
+
+1) REACCIÓN Y ν:   CO + 2 H2 = CH4O
+   ν = {CO: -1, H2: -2, CH4O: +1}   →   δ = Σν = -2
+   Inertes: (ninguno)
+
+2) TABLA EN ξ (n_i = n_i0 + ν_i·ξ):
+  | especie | n_i0 | ν_i | n_i(ξ)  | y_i(ξ)              |
+  |---------|------|-----|---------|---------------------|
+  | CO      | 1    | -1  | 1 − 1·ξ | (1 − 1·ξ)/(3 − 2·ξ) |
+  | H2      | 2    | -2  | 2 − 2·ξ | (2 − 2·ξ)/(3 − 2·ξ) |
+  | CH4O    | 0    | 1   | 0 + 1·ξ | (0 + 1·ξ)/(3 − 2·ξ) |
+   n_T = 3 − 2·ξ;   ξ ∈ (0, 1)
+   K_y = Π y_i^ν_i = y_CO^(-1) · y_H2^(-2) · y_CH4O^(1)
+   K = F·K_y·(P/P°)^δ,  P/P° = 100
+   Modelo: solución ideal (Lewis-Randall, φ_i puro por Pitzer)
+   Convención 'maestra':  K = K_y·(P/P°)^δ / K_phi   ⇔   K_y = K·(P/P°)^(−δ)·K_phi   [convención de la maestra; F = 1/K_phi]
+
+3) K(T) POR LA EC. 13.18 (Tablas C.1/C.4 SVA)
+   ΔH°298 = -90135 J/mol   ΔG°298 = -24791 J/mol   K298 = 2.205e+04
+   ΔA = -7.6630  ΔB = 1.0815e-02  ΔC = -3.4500e-06  ΔD = -1.3500e+04
+
+4) SOLUCIÓN  (modo 'T_para_y', modelo 'lewis')
+   T = 504.23 K   P = 100 bar   K(T) = 0.004677   ΔH°(T) = -96.96 kJ/mol   ΔG°(T) = 22.49 kJ/mol
+  | esp  | Tc    | Pc    | ω      | Tr      | Pr     | B0       | B1        | φ       | Vr≥2 |
+  |------|-------|-------|--------|---------|--------|----------|-----------|---------|------|
+  | CO   | 132.9 | 34.99 | 0.048  | 3.794   | 2.858  | 0.033025 | 0.13836   | 1.0303  | NO*  |
+  | H2   | 33.19 | 13.13 | -0.216 | 15.192  | 7.6161 | 0.077571 | 0.139     | 1.0241  | sí   |
+  | CH4O | 512.6 | 80.97 | 0.564  | 0.98367 | 1.235  | -0.35027 | -0.045317 | 0.62384 | NO*  |
+   * Vr < 2: φ extrapolado fuera de la zona virial (Fig. 3.14 SVA)
+   K_phi = Π φ_i^ν_i = 0.57729   →   F = 1.73224   (convención 'maestra')
+   K_ef = K/F = 0.0027   (lo que resuelve el solver ideal: K_y·(P/P°)^δ = K_ef)
+   K_y requerida = K·(P/P°)^(−δ)/F = 27   →   ξ = 0.750000
+  | especie | n_i  | y_i     |
+  |---------|------|---------|
+  | CO      | 0.25 | 0.16667 |
+  | H2      | 0.5  | 0.33333 |
+  | CH4O    | 0.75 | 0.5     |
+   n_T = 1.500000
+
+   → T = 504.23 K  para  y_CH4O = 0.5
+   Comparación: gas ideal T = 516.48 K;  'rigurosa' T = 527.42 K
+
+AUTOVALIDACIÓN
+  [PASS] residual ln K_y − [ln K − δ ln(P/P°) − ln F] = -1.3e-15
+  [PASS] Σ y_i = 1.000000000000
+  [PASS] todas las n_i ≥ 0
+  [PASS] balance atómico cierra (máx |Δ| = 0.0e+00)
+  [PASS] y_CH4O(T = 504.23 K) = 0.5000000000 = objetivo
+  [PASS] K_ef·F = K  (convención 'maestra' aplicada una sola vez)
+  [info] K_phi = 0.5773, F = 1.7322 (K_phi < 1 → F > 1); convención 'maestra'
+  [PASS] contraste con run_exercise (misma T, fugacidad=lewis): máx |Δy| = 0.0e+00, selfcheck PASS
+
+VEREDICTO: OK
+
+CHEQUEO A MANO (fórmulas del planteamiento, sin la plantilla):
+   1) K(300) = 17620 → ξ = 0.975206 → y_CH3OH = 0.9291
+   2) K_y(ξ = 0.75) = 27.0000 (= 27) → K(T) = 27 → T = 364.47 K
+   3) gas ideal a 100 bar: K(T) = 27/100² → T = 516.48 K
+      Lewis-Randall 'maestra': K(T) = 27/(100²·K_phi) → T = 504.23 K  (K_phi = 0.5773)
+  [PASS] K_y para y = 0.5 vale 27 (planteamiento)
+  [PASS] plantilla T = 504.2277 K = a mano 504.2277 K
+  [PASS] δ < 0: T(100 bar) = 516.5 K > T(1 bar) = 364.5 K (Le Chatelier)
+  [PASS] K_phi = 0.5773 < 1 (φ_CH3OH < 1, φ_CO y φ_H2 > 1)
+  [info] Vr < 2 (virial extrapolada, Fig. 3.14): CO, CH4O
+
+RESULTADO a3): T(y = 0.5, 100 bar, Lewis-Randall 'maestra') = 504.2 K   (gas ideal 516.5 K)
+VEREDICTO SIMULACRO: OK
+
+########################################################################
+# b_flama_etileno.py a
+########################################################################
+========================================================================
+  Simulacro ba) flama adiabática C2H4: 0% de exceso, aire a 25 °C
+========================================================================
+
+  Salida (mol): N2 11.2857, CO2 2.0000, H2O 2.0000
+  Balance atómico: {'C': 0.0, 'H': 0.0, 'N': 0.0, 'O': 0.0}
+  | término                      | J           |
+  |------------------------------|-------------|
+  | ΔH°_R                        | 0           |
+  | ξ1·ΔH°298 (-1323164 J)       | -1.3232e+06 |
+  | ΔH°_P (→ 2533.49 K)          | 1.3232e+06  |
+  | Q = ΔH                       | 0           |
+  | Q por entalpías de formación | 0           |
+
+  T salida = 2533.49 K (2260.34 °C);  Q = 0.0 J;  ⟨Cp⟩_H = 591.930 J/K
+  [PASS] trayectoria = formación y balance de materia consistente
+  [PASS] balance atómico cierra: {'C': 0.0, 'H': 0.0, 'N': 0.0, 'O': 0.0}
+  [PASS] Q trayectoria = Q formación = 0 (0.0e+00 J, 0.0e+00 J)
+  [PASS] ξ·ΔH°298 = -1323164 J (a mano −1 323 164)
+  [PASS] T = 2533.49 K vs Excel s18 2533.49 K (|Δ| = 7.5e-06 K)
+  [info] Cp extrapolado (T > Tmax): N2, CO2, H2O
+
+RESULTADO b) inciso a: T flama = 2533.5 K (2260.3 °C)
+VEREDICTO SIMULACRO: OK
+
+[stderr]
+<repo>/core/energia.py:284: UserWarning: H_sensible: T = 2533.5 K > Tmax = 2000 K del Cp de N2 (extrapolación)
+  dHP = H_sensible(salida, T_salida, datos, T_ref)
+<repo>/core/energia.py:284: UserWarning: H_sensible: T = 2533.5 K > Tmax = 2000 K del Cp de CO2 (extrapolación)
+  dHP = H_sensible(salida, T_salida, datos, T_ref)
+<repo>/core/energia.py:284: UserWarning: H_sensible: T = 2533.5 K > Tmax = 2000 K del Cp de H2O (extrapolación)
+  dHP = H_sensible(salida, T_salida, datos, T_ref)
+
+########################################################################
+# b_flama_etileno.py b
+########################################################################
+========================================================================
+  Simulacro bb) flama adiabática C2H4: 25% de exceso, aire a 25 °C
+========================================================================
+
+  Salida (mol): O2 0.7500, N2 14.1071, CO2 2.0000, H2O 2.0000
+  Balance atómico: {'C': 0.0, 'H': 0.0, 'N': 0.0, 'O': 0.0}
+  | término                      | J           |
+  |------------------------------|-------------|
+  | ΔH°_R                        | 0           |
+  | ξ1·ΔH°298 (-1323164 J)       | -1.3232e+06 |
+  | ΔH°_P (→ 2198.55 K)          | 1.3232e+06  |
+  | Q = ΔH                       | 1.1642e-09  |
+  | Q por entalpías de formación | 1.1642e-09  |
+
+  T salida = 2198.55 K (1925.40 °C);  Q = 0.0 J;  ⟨Cp⟩_H = 696.255 J/K
+  [PASS] trayectoria = formación y balance de materia consistente
+  [PASS] balance atómico cierra: {'C': 0.0, 'H': 0.0, 'N': 0.0, 'O': 0.0}
+  [PASS] Q trayectoria = Q formación = 0 (1.2e-09 J, 1.2e-09 J)
+  [PASS] ξ·ΔH°298 = -1323164 J (a mano −1 323 164)
+  [PASS] T = 2198.55 K vs Excel s18 2198.55 K (|Δ| = 3.2e-05 K)
+  [info] Cp extrapolado (T > Tmax): O2, N2, CO2, H2O
+
+RESULTADO b) inciso b: T flama = 2198.6 K (1925.4 °C)
+VEREDICTO SIMULACRO: OK
+
+[stderr]
+<repo>/core/energia.py:284: UserWarning: H_sensible: T = 2198.6 K > Tmax = 2000 K del Cp de O2 (extrapolación)
+  dHP = H_sensible(salida, T_salida, datos, T_ref)
+<repo>/core/energia.py:284: UserWarning: H_sensible: T = 2198.6 K > Tmax = 2000 K del Cp de N2 (extrapolación)
+  dHP = H_sensible(salida, T_salida, datos, T_ref)
+<repo>/core/energia.py:284: UserWarning: H_sensible: T = 2198.6 K > Tmax = 2000 K del Cp de CO2 (extrapolación)
+  dHP = H_sensible(salida, T_salida, datos, T_ref)
+<repo>/core/energia.py:284: UserWarning: H_sensible: T = 2198.6 K > Tmax = 2000 K del Cp de H2O (extrapolación)
+  dHP = H_sensible(salida, T_salida, datos, T_ref)
+
+########################################################################
+# b_flama_etileno.py c
+########################################################################
+========================================================================
+  Simulacro bc) flama adiabática C2H4: 50% de exceso, aire a 25 °C
+========================================================================
+
+  Salida (mol): O2 1.5000, N2 16.9286, CO2 2.0000, H2O 2.0000
+  Balance atómico: {'C': 0.0, 'H': 0.0, 'N': 0.0, 'O': 0.0}
+  | término                      | J           |
+  |------------------------------|-------------|
+  | ΔH°_R                        | 0           |
+  | ξ1·ΔH°298 (-1323164 J)       | -1.3232e+06 |
+  | ΔH°_P (→ 1950.90 K)          | 1.3232e+06  |
+  | Q = ΔH                       | 1.397e-09   |
+  | Q por entalpías de formación | 1.397e-09   |
+
+  T salida = 1950.90 K (1677.75 °C);  Q = 0.0 J;  ⟨Cp⟩_H = 800.584 J/K
+  [PASS] trayectoria = formación y balance de materia consistente
+  [PASS] balance atómico cierra: {'C': 0.0, 'H': 0.0, 'N': 0.0, 'O': 0.0}
+  [PASS] Q trayectoria = Q formación = 0 (1.4e-09 J, 1.4e-09 J)
+  [PASS] ξ·ΔH°298 = -1323164 J (a mano −1 323 164)
+  [PASS] T = 1950.90 K vs Excel s18 1950.90 K (|Δ| = 3.2e-05 K)
+  [info] Cp extrapolado (T > Tmax): no
+
+RESULTADO b) inciso c: T flama = 1950.9 K (1677.7 °C)
+VEREDICTO SIMULACRO: OK
+
+########################################################################
+# b_flama_etileno.py d
+########################################################################
+========================================================================
+  Simulacro bd) flama adiabática C2H4: 100% de exceso, aire a 25 °C
+========================================================================
+
+  Salida (mol): O2 3.0000, N2 22.5714, CO2 2.0000, H2O 2.0000
+  Balance atómico: {'C': 0.0, 'H': 0.0, 'N': 0.0, 'O': 0.0}
+  | término                      | J           |
+  |------------------------------|-------------|
+  | ΔH°_R                        | 0           |
+  | ξ1·ΔH°298 (-1323164 J)       | -1.3232e+06 |
+  | ΔH°_P (→ 1609.19 K)          | 1.3232e+06  |
+  | Q = ΔH                       | 1.1642e-09  |
+  | Q por entalpías de formación | 1.1642e-09  |
+
+  T salida = 1609.19 K (1336.04 °C);  Q = 0.0 J;  ⟨Cp⟩_H = 1009.244 J/K
+  [PASS] trayectoria = formación y balance de materia consistente
+  [PASS] balance atómico cierra: {'C': 0.0, 'H': 0.0, 'N': 0.0, 'O': 0.0}
+  [PASS] Q trayectoria = Q formación = 0 (1.2e-09 J, 1.2e-09 J)
+  [PASS] ξ·ΔH°298 = -1323164 J (a mano −1 323 164)
+  [PASS] T = 1609.19 K vs Excel s18 1609.19 K (|Δ| = 3.7e-05 K)
+  [info] Cp extrapolado (T > Tmax): no
+
+RESULTADO b) inciso d: T flama = 1609.2 K (1336.0 °C)
+VEREDICTO SIMULACRO: OK
+
+########################################################################
+# b_flama_etileno.py e
+########################################################################
+========================================================================
+  Simulacro be) flama adiabática C2H4: 50% de exceso, aire a 500 °C
+========================================================================
+
+  Salida (mol): O2 1.5000, N2 16.9286, CO2 2.0000, H2O 2.0000
+  Balance atómico: {'C': 0.0, 'H': 0.0, 'N': 0.0, 'O': 0.0}
+  | término                      | J           |
+  |------------------------------|-------------|
+  | ΔH°_R                        | -3.0941e+05 |
+  | ξ1·ΔH°298 (-1323164 J)       | -1.3232e+06 |
+  | ΔH°_P (→ 2282.54 K)          | 1.6326e+06  |
+  | Q = ΔH                       | 1.397e-09   |
+  | Q por entalpías de formación | 1.4552e-09  |
+
+  T salida = 2282.54 K (2009.39 °C);  Q = 0.0 J;  ⟨Cp⟩_H = 822.709 J/K
+  [PASS] trayectoria = formación y balance de materia consistente
+  [PASS] balance atómico cierra: {'C': 0.0, 'H': 0.0, 'N': 0.0, 'O': 0.0}
+  [PASS] Q trayectoria = Q formación = 0 (1.4e-09 J, 1.5e-09 J)
+  [PASS] ξ·ΔH°298 = -1323164 J (a mano −1 323 164)
+  [PASS] T = 2282.54 K vs Excel s18 2282.54 K (|Δ| = 4.8e-05 K)
+  [info] Cp extrapolado (T > Tmax): O2, N2, CO2, H2O
+
+RESULTADO b) inciso e: T flama = 2282.5 K (2009.4 °C)
+VEREDICTO SIMULACRO: OK
+
+[stderr]
+<repo>/core/energia.py:284: UserWarning: H_sensible: T = 2282.5 K > Tmax = 2000 K del Cp de O2 (extrapolación)
+  dHP = H_sensible(salida, T_salida, datos, T_ref)
+<repo>/core/energia.py:284: UserWarning: H_sensible: T = 2282.5 K > Tmax = 2000 K del Cp de N2 (extrapolación)
+  dHP = H_sensible(salida, T_salida, datos, T_ref)
+<repo>/core/energia.py:284: UserWarning: H_sensible: T = 2282.5 K > Tmax = 2000 K del Cp de CO2 (extrapolación)
+  dHP = H_sensible(salida, T_salida, datos, T_ref)
+<repo>/core/energia.py:284: UserWarning: H_sensible: T = 2282.5 K > Tmax = 2000 K del Cp de H2O (extrapolación)
+  dHP = H_sensible(salida, T_salida, datos, T_ref)
+
+########################################################################
+# c_amoniaco_NO_adiabatico.py 
+########################################################################
+========================================================================
+  Simulacro c) NH3 → NO: 30 % exceso de aire seco, 75 °C, X = 80 %, adiabático
+========================================================================
+
+  Salida (mol): NH3 0.8000, O2 2.5000, N2 24.4524, NO 3.2000, H2O 4.8000
+  Balance atómico: {'H': 0.0, 'N': 0.0, 'O': 0.0}
+  | término                      | J           |
+  |------------------------------|-------------|
+  | ΔH°_R                        | -52638      |
+  | ξ1·ΔH°298 (-905468 J)        | -7.2437e+05 |
+  | ΔH°_P (→ 978.84 K)           | 7.7701e+05  |
+  | Q = ΔH                       | 0           |
+  | Q por entalpías de formación | -1.1642e-10 |
+
+  T salida = 978.84 K (705.69 °C);  Q = 0.0 J;  ⟨Cp⟩_H = 1141.511 J/K
+  [PASS] trayectoria = formación y balance de materia consistente
+CHEQUEO A MANO:
+   ΔH°_R = -52638 J   ξ·ΔH°298 = -724374 J   → T = 978.84 K
+  [PASS] balance atómico cierra: {'H': 0.0, 'N': 0.0, 'O': 0.0}
+  [PASS] Q trayectoria = Q formación (0.0e+00 vs -1.2e-10 J)
+  [PASS] salida de la plantilla = tabla a mano (NH3 0.8, O2 2.5, NO 3.2, H2O 4.8)
+  [PASS] conversión de NH3 = 80%
+  [PASS] T plantilla 978.8377 K = a mano 978.8377 K
+  [info] Cp extrapolado (T > Tmax): no
+
+RESULTADO c): T salida = 978.8 K (705.7 °C)
+VEREDICTO SIMULACRO: OK
+
+########################################################################
+# d_syngas_dos_reacciones.py 
+########################################################################
+========================================================================
+  Simulacro d) syngas: 2 reacciones, reactivos 600 K, productos 1300 K, 17.4 % CO
+========================================================================
+
+  Salida (mol): H2O 0.8700, CO 0.8700, H2 3.1300, CO2 0.1300
+  Balance atómico: {'C': 0.0, 'H': 0.0, 'O': 0.0}
+  | término                      | J          |
+  |------------------------------|------------|
+  | ΔH°_R                        | -34393     |
+  | ξ1·ΔH°298 (205813 J)         | 1.7906e+05 |
+  | ξ2·ΔH°298 (164647 J)         | 21404      |
+  | ΔH°_P (→ 1300.00 K)          | 1.6194e+05 |
+  | Q = ΔH                       | 3.2801e+05 |
+  | Q por entalpías de formación | 3.2801e+05 |
+
+  T salida = 1300.00 K (1026.85 °C);  Q = 328012.1 J;  ⟨Cp⟩_H = 161.645 J/K
+  [PASS] trayectoria = formación y balance de materia consistente
+  [PASS] ξ1 = 0.87, ξ2 = 0.13 (a mano)
+  [PASS] n_T = 5.0000, y_CO = 0.1740 (dato 0.174)
+  [PASS] CH4 convertido por completo
+  [PASS] balance atómico cierra: {'C': 0.0, 'H': 0.0, 'O': 0.0}
+  [PASS] ΔH°298 = 205813 y 164647 J (a mano 205 813 y 164 647)
+  [PASS] Q trayectoria = Q formación (328012.08 vs 328012.08 J)
+  [PASS] Q = 328.01 kJ/mol CH4 (≈ 328)
+
+RESULTADO d): Q = 328.01 kJ por mol de CH4 (se suministra calor)
+VEREDICTO SIMULACRO: OK
+
+########################################################################
+# e_hhv_lhv_mezclas.py 1
+########################################################################
+========================================================================
+  Simulacro e1) Sesión 17 Ej. 2: gas natural 87.5/7/2/3.5
+========================================================================
+  | especie | y_i   | HHV kJ/mol | LHV kJ/mol |
+  |---------|-------|------------|------------|
+  | CH4     | 0.875 | 890.65     | 802.62     |
+  | C2H6    | 0.07  | 1560.7     | 1428.7     |
+  | C3H8    | 0.02  | 2219.2     | 2043.1     |
+
+  HHV = 932.949 kJ/mol  (51.816 MJ/kg)
+  LHV = 843.165 kJ/mol  (46.830 MJ/kg)
+  ΔH°c (H2O l) = -932.949 kJ/mol;  M = 18.005 g/mol;  Σy = 1.0000
+CHEQUEO A MANO:
+   HHV = Σ y·HHV_i = 932.949 kJ/mol;  LHV = HHV − 44.012·Σ y·n_H2O = 843.165 kJ/mol
+  [PASS] HHV plantilla 932.949 = a mano 932.949 kJ/mol
+  [PASS] LHV plantilla 843.165 = a mano 843.165 kJ/mol
+  [PASS] Σ y = 1.0000
+  [PASS] HHV > LHV
+   M = 18.0050 g/mol → HHV = 51.816 MJ/kg = 51816 kJ/kg;  LHV = 46.830 MJ/kg = 46830 kJ/kg
+  [PASS] O2 estequiométrico (100 mol) = 209.50 mol (a mano 209.50)
+   Aire estequiométrico (100 mol de mezcla) = 209.50/0.21 = 997.62 mol
+
+RESULTADO e) inciso 1: HHV = 932.95 kJ/mol (51816 kJ/kg, 51.82 MJ/kg); LHV = 843.16 kJ/mol (46830 kJ/kg, 46.83 MJ/kg); O2/aire esteq. (100 mol) = 209.5/997.6 mol
+VEREDICTO SIMULACRO: OK
+
+########################################################################
+# e_hhv_lhv_mezclas.py 2
+########################################################################
+========================================================================
+  Simulacro e2) Sesión 16 Ej. 1: 75 % CH4, 10 % C2H6, 12 % H2, 3 % N2
+========================================================================
+  | especie | y_i  | HHV kJ/mol | LHV kJ/mol |
+  |---------|------|------------|------------|
+  | CH4     | 0.75 | 890.65     | 802.62     |
+  | C2H6    | 0.1  | 1560.7     | 1428.7     |
+  | H2      | 0.12 | 285.83     | 241.82     |
+
+  HHV = 858.355 kJ/mol  (53.243 MJ/kg)
+  LHV = 773.852 kJ/mol  (48.001 MJ/kg)
+  ΔH°c (H2O l) = -858.355 kJ/mol;  M = 16.122 g/mol;  Σy = 1.0000
+CHEQUEO A MANO:
+   HHV = Σ y·HHV_i = 858.355 kJ/mol;  LHV = HHV − 44.012·Σ y·n_H2O = 773.852 kJ/mol
+  [PASS] HHV plantilla 858.355 = a mano 858.355 kJ/mol
+  [PASS] LHV plantilla 773.852 = a mano 773.852 kJ/mol
+  [PASS] Σ y = 1.0000
+  [PASS] HHV > LHV
+   M = 16.1216 g/mol → HHV = 53.243 MJ/kg = 53243 kJ/kg;  LHV = 48.001 MJ/kg = 48001 kJ/kg
+  [PASS] O2 estequiométrico (100 mol) = 191.00 mol (a mano 191.00)
+   Aire estequiométrico (100 mol de mezcla) = 191.00/0.21 = 909.52 mol
+
+RESULTADO e) inciso 2: HHV = 858.36 kJ/mol (53243 kJ/kg, 53.24 MJ/kg); LHV = 773.85 kJ/mol (48001 kJ/kg, 48.00 MJ/kg); O2/aire esteq. (100 mol) = 191.0/909.5 mol
+VEREDICTO SIMULACRO: OK

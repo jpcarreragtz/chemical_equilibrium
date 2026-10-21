@@ -23,6 +23,8 @@ Convenciones (las mismas de thermo.py y de los Excel s17/s18)
       HHV = −ΔH°c con H2O(l)       LHV = −ΔH°c con H2O(g)
       HHV = LHV + n_H2O · ΔH_lv(298 K)    (ΔH_lv = 44 012 J/mol, SVA)
       Mezcla: HHV_mezcla = Σ y_i HHV_i   (inertes como N2 aportan 0)
+      Ec. de Dulong (análisis elemental, fracciones masa; slides Sesión 17):
+        HHV [MJ/kg] = 33.9·C + 144.2·(H − O/8) + 9.4·S;  LHV = HHV − 2.442·(9H)
 
 Datos: ΔH°f y Cp de data/sva_tables.json (Tablas C.1/C.4 verificadas);
 ΔH°f del agua LÍQUIDA (−285 830 J/mol) y ΔH_lv(298) no están en el JSON
@@ -333,3 +335,32 @@ def h_liquido_sat(T_C: float) -> float:
         if x1 <= T_C <= x2:
             return y1 + (T_C - x1) * (y2 - y1) / (x2 - x1)
     raise ValueError(f"T = {T_C} °C fuera de la tabla (0.01–100 °C)")
+
+
+# ----------------------------------------------------------------------------
+# Ecuación de Dulong (combustibles con análisis elemental: carbón, biomasa)
+# ----------------------------------------------------------------------------
+
+def hhv_dulong(C: float, H: float, O: float, S: float = 0.0,
+               base: str = "MJ/kg") -> Dict[str, float]:
+    """HHV y LHV por la ecuación empírica de Dulong (slides Sesión 17):
+
+        HHV [MJ/kg] = 33.9·C + 144.2·(H − O/8) + 9.4·S
+        LHV [MJ/kg] = HHV − 2.442·(9·H)
+
+    C, H, O, S: FRACCIONES MASA (0–1) del análisis elemental (p. ej. base
+    seca y libre de cenizas, daf). 9·H = kg de agua formada por kg de
+    combustible; 2.442 MJ/kg = ΔH_lv del agua a 25 °C.
+    base: "MJ/kg" (default) o "kJ/kg". Devuelve {"HHV", "LHV", "base"}."""
+    for nombre, v in (("C", C), ("H", H), ("O", O), ("S", S)):
+        if not 0.0 <= v <= 1.0:
+            raise ValueError(f"hhv_dulong: {nombre} = {v} no es fracción masa "
+                             f"(0–1); si tienes %, divide entre 100")
+    factores = {"MJ/kg": 1.0, "kJ/kg": 1000.0}
+    if base not in factores:
+        raise ValueError(f"hhv_dulong: base {base!r} no soportada; usa "
+                         f"{sorted(factores)}")
+    hhv = 33.9 * C + 144.2 * (H - O / 8.0) + 9.4 * S
+    lhv = hhv - 2.442 * (9.0 * H)
+    f = factores[base]
+    return {"HHV": hhv * f, "LHV": lhv * f, "base": base}
