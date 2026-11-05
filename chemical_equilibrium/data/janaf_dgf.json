@@ -1,0 +1,18 @@
+{
+  "_meta": {
+    "descripcion": "ΔG°f (J/mol) de gases ideales, por temperatura, leídos de las tablas NIST-JANAF.",
+    "fuente": "https://janaf.nist.gov/ (columna delta-f G°, kJ/mol × 1000)",
+    "fecha_consulta": "2026-11-05",
+    "no_en_janaf": {
+      "C2H6": "No aparece en el índice de fórmulas de JANAF: usar core.gibbs.dGf_sva (Tablas C.1, C.2 y C.4 de SVA)."
+    }
+  },
+  "CH4":  {"tabla": "C-067", "1000": 19492},
+  "H2O":  {"tabla": "H-064", "1000": -192590},
+  "CO":   {"tabla": "C-093", "1000": -200275},
+  "CO2":  {"tabla": "C-095", "1000": -395886},
+  "C2H2": {"tabla": "C-127", "1000": 169607},
+  "C2H4": {"tabla": "C-128", "1000": 119122},
+  "H2":   {"tabla": "referencia", "1000": 0},
+  "O2":   {"tabla": "referencia", "1000": 0}
+}

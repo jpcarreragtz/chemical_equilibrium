@@ -18,10 +18,12 @@ chemical_equilibrium/
 │   ├── convenciones.py          # ÚNICO lugar que decide cómo entra K_phi: "maestra" (default) | "rigurosa"
 │   ├── energia.py               # 2do parcial: balance de energía con reacción, HHV/LHV, T flama adiabática
 │   ├── exercise.py              # motor de plantilla: run_exercise(...)
+│   ├── gibbs.py                 # S25: minimización de G sin reacciones ni valor inicial (RAND), datos y validación
 │   └── selfcheck.py             # 12 puntos de autovalidación (validate, sweep)
 ├── data/
 │   ├── sva_tables.json          # Smith–Van Ness C.1/C.4, 42 especies verificadas
 │   ├── criticas_b1.json         # Tc, Pc, ω (Tabla B.1) para phi de Pitzer
+│   ├── janaf_dgf.json           # ΔG°f por T capturados de janaf.nist.gov, con su tabla
 │   └── raw/                     # (fotos/pdf de tablas originales; fuera de git)
 ├── tests/
 │   ├── tests.py                 # casos a–n con respuesta conocida (exit 0 = PASS)

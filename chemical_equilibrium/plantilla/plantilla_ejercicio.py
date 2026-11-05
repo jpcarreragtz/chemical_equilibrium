@@ -33,6 +33,13 @@ Reglas de captura
   pura (Pitzer, Tc/Pc/ω de data/criticas_b1.json) y se resuelve con la K
   efectiva según core/convenciones.py (convencion_Kphi = None → default
   "maestra": K_y = K·(P/P°)^(−δ)·K_phi; "rigurosa": ÷K_phi, SVA 13.28).
+* reacciones_independientes = True (método matricial, S23–24): muestra Aᵀ,
+  rango, r, operaciones hasta [I | Z], F → −F con [−I | −Z], ν completa
+  (R1, R2, ... como columnas), las reacciones leídas de los signos de ν y
+  Aᵀν = 0, con las especies de tus reacciones. Las
+  componentes se eligen con core.independencia.elegir_componentes (criterio
+  de CLAUDE.md): componentes_enunciado si las dan; si no, la alimentación
+  en su orden, luego complemento (o, sin él, las demás especies en orden).
 
 El ejemplo precargado es el CASO DEL EXAMEN: pirólisis de propano,
 C3H8 = C2H4 + CH4 y C3H8 = C3H6 + H2, 10 mol/s de C3H8, 1 bar,
@@ -82,6 +89,13 @@ reacciones = [                       # texto con coeficientes, ya balanceadas
 ]
 
 alimentacion = {"C3H8": 10.0}        # mol (o mol/s); inertes van aquí también
+                                     # (su orden también da los 1os pivotes)
+
+# --- reacciones independientes (método matricial). Componentes: enunciado >
+#     alimentación (en su orden) > complemento > demás especies en orden
+reacciones_independientes = False    # True: muestra A, rango, r, [I | Z] y ν
+complemento = None                   # p. ej. ["H2"]: completa los pivotes
+componentes_enunciado = None         # p. ej. ["CH4", "H2O", "H2"] si las dan
 
 fase = "gas"                         # "gas" | "liquido"
 P, P0, unidad = 1.0, 1.0, "bar"      # P y P0 en la MISMA unidad
@@ -106,6 +120,69 @@ limitante = "C3H8"                   # None = elige el 1er reactivo de R1
 fugacidad = None          # None (gas ideal) | "lewis" (φ puro, Pitzer)
 convencion_Kphi = None    # None = core.convenciones (default "maestra")
 # ══════════════════════════ FIN DE INPUTS ═════════════════════════════════
+
+# %% Reacciones independientes — solo si reacciones_independientes = True
+# Orden: Aᵀ, operaciones hasta [I | Z], F → −F con [−I | −Z], ν completa
+# (R1, R2, ... como columnas), reacciones leídas de ν y Aᵀν = 0.
+if reacciones_independientes:
+    from core.independencia import (comprobar_conservacion, elegir_componentes,
+                                    escalar_columnas, formatear_matriz,
+                                    generan_mismo_espacio, matriz_atomica,
+                                    negar_renglones, nu_completa,
+                                    num_reacciones_independientes, rango,
+                                    rango_reacciones, reaccion_desde_columna,
+                                    reducir_por_componentes, transpuesta)
+    from core.reactions import build_system
+    especies_ri = build_system(reacciones, alimentacion)[0]
+    A_ri, elementos_ri = matriz_atomica(especies_ri)
+    At_ri = transpuesta(A_ri)
+    componentes_ri, criterio_ri = elegir_componentes(
+        especies_ri, A_ri, alimentacion, complemento, componentes_enunciado)
+    red_ri = reducir_por_componentes(At_ri, especies_ri, componentes_ri)
+    k_ri = len(componentes_ri)
+    nu_frac_ri, filas_nu_ri = nu_completa(red_ri)
+    nu_ri, factores_ri = escalar_columnas(nu_frac_ri)
+    rx_ri = [f"R{j + 1}" for j in range(len(nu_ri[0]))]
+    filas_f_ri = [f"f{i + 1}" for i in range(len(At_ri))]
+    print("\n" + "=" * 72 + "\nReacciones independientes (método matricial)\n"
+          + "=" * 72)
+    print("1. Aᵀ (elementos × especies)")
+    print(formatear_matriz(At_ri, filas=elementos_ri, columnas=especies_ri))
+    print(f"N = {len(especies_ri)}, rango = {rango(A_ri)}, "
+          f"r = {num_reacciones_independientes(A_ri)}\n")
+    print(criterio_ri)
+    print("\n2. Operaciones de renglón hasta [I | Z]")
+    print(formatear_matriz(red_ri["inicial"], filas=filas_f_ri,
+                           columnas=red_ri["columnas"], corte=k_ri))
+    for desc, M in red_ri["pasos"]:
+        print(f"\n{desc}")
+        print(formatear_matriz(M, filas=filas_f_ri, columnas=red_ri["columnas"],
+                               corte=k_ri))
+    print("\n[I | Z]:")
+    print(formatear_matriz(red_ri["reducida"], filas=componentes_ri,
+                           columnas=red_ri["columnas"], corte=k_ri))
+    print("\n3. F → −F: [−I | −Z] (−Z = ν de las componentes)")
+    print(formatear_matriz(negar_renglones(red_ri["reducida"]), filas=componentes_ri,
+                           columnas=red_ri["columnas"], corte=k_ri))
+    print("\n4. ν completa (−Z sobre la identidad; una columna por reacción)")
+    if any(f != 1 for f in factores_ri):
+        print(formatear_matriz(nu_frac_ri, filas=filas_nu_ri, columnas=rx_ri))
+        print("Cada columna al mínimo entero positivo: "
+              + ", ".join(f"{n} ×{f}" for n, f in zip(rx_ri, factores_ri)))
+    print(formatear_matriz(nu_ri, filas=filas_nu_ri, columnas=rx_ri))
+    print("\n5. Reacciones leídas de ν (ν < 0 reactivo, ν > 0 producto)")
+    for nombre, col in zip(rx_ri, transpuesta(nu_ri)):
+        print(f"{nombre}: {reaccion_desde_columna(col, filas_nu_ri, especies_ri)}")
+    prod_ri, ok_ri = comprobar_conservacion(red_ri["inicial"], transpuesta(nu_ri))
+    print("\n6. Aᵀν = 0 (columnas de Aᵀ en el orden de los renglones de ν)")
+    print(formatear_matriz(prod_ri, filas=elementos_ri, columnas=rx_ri))
+    print(f"Aᵀν = 0: {'SÍ' if ok_ri else 'NO'}")
+    print(f"\nTus {len(reacciones)} reacciones tienen rango "
+          f"{rango_reacciones(reacciones, especies_ri)} de r = {len(rx_ri)}; "
+          "generan el mismo espacio que ν: "
+          + ("SÍ" if generan_mismo_espacio(
+                reacciones, [dict(zip(filas_nu_ri, c))
+                             for c in transpuesta(nu_ri)]) else "NO"))
 
 # %% Resolver — K(T) (ec. 13.18 si modo termo) + solver + selfcheck + CSV + PNG
 # run_exercise hace todo en una llamada e imprime el reporte completo
