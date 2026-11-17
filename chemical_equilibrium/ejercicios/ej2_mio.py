@@ -33,6 +33,7 @@ except NameError:                                                # celda/noteboo
         raise RuntimeError("no encuentro core/ desde el cwd: corre el kernel "
                            "con la carpeta del script como directorio de trabajo")
 sys.path.insert(0, str(_RAIZ))
+import core.entorno  # noqa: F401
 
 from core import SALIDAS
 from core.equilibrium import solve_extents

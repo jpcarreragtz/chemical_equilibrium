@@ -49,6 +49,7 @@ import sys
 from math import exp, log
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))  # raíz del proyecto
+import core.entorno  # noqa: F401
 
 import numpy as np
 from scipy.optimize import brentq, least_squares, minimize

@@ -2,6 +2,7 @@
 
 Especies: parafinas C1..C15 (CkH2k+2), CO2, H2O, H2, CO. ΔG a 500 K y φ de la
 maestra (data/ft_s27_maestra.json, "Sesión 27, diapositiva Datos").
+Datos de la maestra (Sesión 27), confirmados por ella el 17-nov-2026; se usan tal cual.
   Análisis 1: CH4, CO2, H2O y suma C5–C15, con y sin ASF (α = 0.80).
   Análisis 2: lo mismo, con y sin φ en la función objetivo.
   Análisis 3: b de biomasa (C=1, H=2, O=1; H2/CO = 1) y de gas natural
@@ -21,11 +22,12 @@ import pathlib
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))  # raíz del proyecto
+import core.entorno  # noqa: F401
 
 import numpy as np
 
 from core import DATA
-from core.gibbs import dGf_sva, minimizar_gibbs, prueba_de_fase, validar_gibbs
+from core.gibbs import minimizar_gibbs, prueba_de_fase, validar_gibbs
 
 SI_NO = {True: "sí", False: "no"}   # etiquetas; compatible con Python < 3.12
 
@@ -162,15 +164,3 @@ for clave, v in VALID.items():
           f"{v.n_pass} PASS {v.n_warn} WARN {v.n_fail} FAIL;  Δ_C = {d_c:+.3f} (a_C = {np.exp(-d_c):.3g})")
 print("El WARN es el punto 7: a_C > 1. A 500 K y 25 bar el grafito (2 CO -> C + CO2) bajaría G;")
 print("la maestra no lo incluye, así que estos equilibrios son solo-gas, metaestables frente a C(s).")
-
-# %% 5. ΔG de la maestra contra dGf_sva (ec. 13.18 de SVA) para C1–C8 a 500 K
-titulo(f"ΔG de la maestra vs dGf_sva (SVA ec. 13.18) a {T:g} K, parafinas C1–C8")
-COMPARA = {}
-print(f"{'':<8}{'maestra':>10}{'dGf_sva':>11}{'Δ (J/mol)':>11}")
-for sp in PARAFINAS:
-    try:
-        s = dGf_sva(sp, T)
-    except KeyError:
-        continue                          # no está en sva_tables.json
-    COMPARA[sp] = s
-    print(f"{ETIQ[sp]:<8}{DGF[sp]:>10.0f}{s:>11.0f}{DGF[sp] - s:>11.0f}")

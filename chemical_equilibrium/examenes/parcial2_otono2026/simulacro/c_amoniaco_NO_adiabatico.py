@@ -20,6 +20,7 @@ Energía (Q = 0):  0 = ΔH°_R + ξ·ΔH°298 + ΔH°_P
 
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))   # raíz (simulacro/ está 3 niveles abajo)
+import core.entorno  # noqa: F401
 
 from core.energia import (C_a_K, F_a_K, T_salida_para_Q, alimentacion_por_atomos,
                           avances_desde_flujos, balance_energia,

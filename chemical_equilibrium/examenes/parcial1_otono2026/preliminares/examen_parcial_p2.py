@@ -11,6 +11,7 @@ equilibrio: los avances salen de las mediciones.
 
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))  # raíz del proyecto
+import core.entorno  # noqa: F401
 
 from core.equilibrium import format_table
 from core.reactions import build_system

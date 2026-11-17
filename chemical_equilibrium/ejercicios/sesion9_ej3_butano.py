@@ -17,6 +17,7 @@ A mayor P baja la conversión porque delta = +1 (Le Chatelier).
 
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))  # raíz del proyecto
+import core.entorno  # noqa: F401
 
 from core.exercise import run_exercise
 

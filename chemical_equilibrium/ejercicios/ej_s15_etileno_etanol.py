@@ -30,7 +30,7 @@ from math import exp, log
 
 _DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))  # raíz del proyecto
-
+import core.entorno  # noqa: F401
 import numpy as np
 from scipy.optimize import brentq
 

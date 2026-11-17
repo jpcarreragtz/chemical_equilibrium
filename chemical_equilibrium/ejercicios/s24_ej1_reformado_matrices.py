@@ -22,6 +22,7 @@ import pathlib
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))  # raíz del proyecto
+import core.entorno  # noqa: F401
 
 from core.independencia import (comprobar_conservacion, elegir_componentes,
                                 escalar_columnas, formatear_matriz,

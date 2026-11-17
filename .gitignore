@@ -28,3 +28,7 @@ chemical_equilibrium/notebooks/.ipynb_checkpoints/
 chemical_equilibrium/salidas/
 chemical_equilibrium/examenes/*/resultados_P*.csv
 chemical_equilibrium/examenes/*/grafica_P*.png
+
+# GAMS: listados y bases de datos regenerables
+*.lst
+*.gdx

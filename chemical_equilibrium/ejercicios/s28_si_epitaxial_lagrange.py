@@ -22,6 +22,7 @@ import sys
 
 _RAIZ = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(_RAIZ))  # raíz del proyecto
+import core.entorno  # noqa: F401
 
 from scipy.optimize import brentq
 

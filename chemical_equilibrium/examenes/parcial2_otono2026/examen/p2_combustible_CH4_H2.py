@@ -26,6 +26,7 @@ c) Productos: CO2 0.6, H2O 1.6, N2 5.267 (sin O2: aire teórico)
 
 import sys, pathlib, warnings
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))   # raíz
+import core.entorno  # noqa: F401
 
 from core.energia import (DHV_H2O_298, T_salida_para_Q, balance_energia,
                           combustion_mezcla, masa_molar, salida_desde_avances)

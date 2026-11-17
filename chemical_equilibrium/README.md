@@ -11,6 +11,7 @@ chemical_equilibrium/
 ├── README.md                    # este mapa
 ├── core/                        # MOTOR — no se toca salvo para corregir bugs
 │   ├── __init__.py              # rutas del proyecto: ROOT, DATA, SALIDAS
+│   ├── entorno.py               # si a python3 le falta numpy/scipy/matplotlib, relanza el script con .venv/bin/python
 │   ├── equilibrium.py           # solvers (Método A y Método B), K<->Kc, checks
 │   ├── reactions.py             # parser: "C3H8 + 3 H2O = 3 CO + 7 H2" -> nu
 │   ├── thermo.py                # Cp/R (C.1), ec. 13.18, Van't Hoff, carga del JSON
@@ -99,6 +100,43 @@ son para estudiar y para versión-reporte. `00_teoria.ipynb` explica ec.
 derivación, tablas y gráfica, y termina en selfcheck (mismos números que
 `ejercicios/ej2_mio.py`). Se regeneran con
 `cd notebooks && jupyter nbconvert --to notebook --execute --inplace *.ipynb`.
+
+## Cómo correr un ejercicio
+
+**Terminal.** Desde cualquier carpeta y con cualquier `python3`:
+
+```bash
+cd "/Users/jpcg/Library/Mobile Documents/com~apple~CloudDocs/IBERO/EQ. Químico/chemical_equilibrium"
+python3 ejercicios/s27_fischer_tropsch.py      # o: cd ejercicios && python3 s27_fischer_tropsch.py
+```
+
+La ruta va **entre comillas** porque "Mobile Documents" y "EQ. Químico"
+llevan espacio; sin comillas, `cd` falla con "too many arguments" o "no such
+file or directory".
+
+Cada script de `ejercicios/`, `plantilla/` y `examenes/` importa
+`core.entorno` justo después de poner la raíz en `sys.path`. Si el `python3`
+de la terminal no tiene numpy, scipy o matplotlib (por ejemplo
+`/usr/bin/python3`, el 3.9 de Apple, que no tiene scipy y daba
+`ModuleNotFoundError: No module named 'scipy'`), el script se relanza solo
+con `.venv/bin/python`. Si no existe el `.venv`, imprime los comandos para
+crearlo. Para usar el entorno del proyecto de forma explícita:
+
+```bash
+.venv/bin/python ejercicios/s27_fischer_tropsch.py
+```
+
+**VS Code.** Abre la carpeta `chemical_equilibrium/` (no `EQ. Químico/`: el
+`.venv` quedaría en una subcarpeta y VS Code puede no detectarlo).
+`.vscode/settings.json` (local, fuera de git) fija
+`python.defaultInterpreterPath` en `${workspaceFolder}/.venv/bin/python`, así
+que "Run Python File" usa el `.venv`. Si la barra de estado muestra otro
+intérprete: `Python: Select Interpreter` → `.venv`. Para correr por celdas
+`# %%`, elige también el kernel `.venv`; un kernel no se puede relanzar solo
+y `core.entorno` solo avisa qué falta.
+
+**GAMS.** `gams ejercicios/s27_fischer_tropsch.gms`; si `gams` no está en el
+PATH, `/Library/Frameworks/GAMS.framework/Versions/Current/Resources/gams`.
 
 ## Cómo correr los tests
 

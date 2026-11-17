@@ -31,6 +31,7 @@ Lewis-Randall → T = 570.4 K con la convención "maestra" (584.5 K rigurosa).
 
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))   # raíz
+import core.entorno  # noqa: F401
 
 import contextlib, io, os
 from math import exp, log

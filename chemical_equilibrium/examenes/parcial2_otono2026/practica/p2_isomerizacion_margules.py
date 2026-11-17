@@ -21,6 +21,7 @@ Fase líquida, estado estándar = líquido puro a T y 1 bar  →  a_i = x_i·γ_
 
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))   # raíz
+import core.entorno  # noqa: F401
 
 from math import exp, log
 from scipy.optimize import brentq

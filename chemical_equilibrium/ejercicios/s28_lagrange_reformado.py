@@ -9,7 +9,8 @@ sin el Newton de core/gibbs.py, y se contrastan con minimizar_gibbs.
 Ejemplo de la diapositiva: reformado 4:1 a 1 bar, 600–1100 K. OJO: la
 diapositiva escribe los balances C = 2, H = 14, O = 3, que son los de
 2 CH4 + 3 H2O (SVA Ej. 13.14), no los de H2O:CH4 = 4:1 (C = 1, H = 12, O = 4).
-Se resuelven los dos casos.
+Se resuelven los dos casos. La maestra confirmó 4:1 (17-nov-2026): es el
+caso que se entrega; el 2:3 queda como referencia.
 
 Nota de la maestra: con los λ de la fase gas se evalúa si otra fase baja G.
 Aquí, grafito: Δ_C = g_C(s)/RT + λ_C/RT = λ_C/RT (ΔfG = 0, JANAF C-002). Si
@@ -21,6 +22,7 @@ import pathlib
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))  # raíz del proyecto
+import core.entorno  # noqa: F401
 
 import numpy as np
 from scipy.optimize import root

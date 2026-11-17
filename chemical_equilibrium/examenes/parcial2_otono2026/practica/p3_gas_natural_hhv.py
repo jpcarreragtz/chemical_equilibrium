@@ -16,6 +16,7 @@ Expresión pedida (base 1 mol de gas natural):
 
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))   # raíz
+import core.entorno  # noqa: F401
 
 from core.energia import calor_combustion, combustion_mezcla, HF_H2O_LIQ
 from core.equilibrium import format_table

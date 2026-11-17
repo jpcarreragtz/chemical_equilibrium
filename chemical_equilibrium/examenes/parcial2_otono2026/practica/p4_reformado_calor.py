@@ -23,6 +23,7 @@ Planteamiento (a mano)  — base: 1 mol de gas producido
 
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))   # raíz
+import core.entorno  # noqa: F401
 
 from core.energia import (C_a_K, alimentacion_por_atomos, avances_desde_flujos,
                           balance_energia)

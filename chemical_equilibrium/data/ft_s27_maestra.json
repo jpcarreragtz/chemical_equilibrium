@@ -2,6 +2,7 @@
   "_meta": {
     "descripcion": "Fischer–Tropsch a 500 K y 25 bar: ΔG a 500 K (J/mol) y coeficiente de fugacidad φ de cada especie, tal como los da la maestra.",
     "fuente": "Sesión 27, diapositiva Datos",
+    "estado": "confirmados por la maestra (17-nov-2026)",
     "T_K": 500,
     "P_bar": 25,
     "notas": "Las parafinas Ck son CkH(2k+2). Los ΔG de C1, CO, CO2 y H2O son ΔfG de JANAF a 500 K redondeados (diferencias de 1, 14, 39 y 1 J/mol). De C2 a C15 suben 16300 J/mol por CH2 (de C1 a C2, 15260)."

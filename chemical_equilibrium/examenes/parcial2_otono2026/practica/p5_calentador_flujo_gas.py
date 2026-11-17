@@ -23,6 +23,7 @@ Planteamiento (a mano) — base 1 mol de combustible
 
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))   # raíz
+import core.entorno  # noqa: F401
 
 from core.energia import (ATM_PA, F_a_K, LBM_A_KG, balance_energia,
                           h_liquido_sat, salida_desde_avances)

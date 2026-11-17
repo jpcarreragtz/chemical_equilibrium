@@ -32,6 +32,7 @@ c) Q = 0 con las mismas ξ y salida → brentq sobre T_salida.
 
 import sys, pathlib, warnings
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))   # raíz
+import core.entorno  # noqa: F401
 
 from core.energia import (C_a_K, T_salida_para_Q, avances_desde_flujos,
                           balance_atomos, balance_energia)

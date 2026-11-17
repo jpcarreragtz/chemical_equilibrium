@@ -23,6 +23,8 @@ Implementación en `core/independencia.py`: `negar_renglones` (F → −F), `nu_
 
 Cuando una diapositiva o un enunciado da un link de datos, siempre se revisa y se usan esos valores. Si un enunciado no trae un dato que debería, no se llena de memoria: se busca en ese link o en la fuente verificada del proyecto, y se dice de dónde salió.
 
+Cuando la maestra da datos (ΔG, φ, K, tablas), se usan tal cual y tienen prioridad sobre JANAF, SVA o cualquier otra fuente. No se reemplazan ni se marcan como inconsistentes en los entregables. Si algo parece raro, se le pregunta al usuario. JANAF y SVA solo se usan cuando la maestra no da el dato.
+
 ## JANAF en cada ejercicio
 
 Si un ejercicio necesita ΔG°f y JANAF aplica, los datos se consultan en el momento y nunca se llenan de memoria:

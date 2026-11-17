@@ -74,17 +74,6 @@ imponer la ASF (u otro modelo cinético) como restricción.
 
 Grafito: Δ_C < 0 (a_C > 1) en 10 de las 12 corridas, así que a 500 K y 25 bar el C(s) bajaría G. La maestra no lo incluye; los resultados son solo-gas y metaestables frente a C(s). Solo el gas natural con ASF da a_C < 1.
 
-| parafina | ΔG maestra (J/mol) | dGf_sva (J/mol) | Δ |
-|---|---|---|---|
-| C1 | -32740 | -32476 | -264 |
-| C2 | -17480 | 6050 | -23530 |
-| C3 | -1180 | 33671 | -34851 |
-| C4 | 15120 | 61620 | -46500 |
-| C5 | 31420 | 89856 | -58436 |
-| C6 | 47720 | 119014 | -71294 |
-| C7 | 64020 | 147491 | -83471 |
-| C8 | 80320 | 175858 | -95538 |
-
 ## S28 — Reformado por Lagrange (Koretsky 9.45–9.47, sistema explícito)
 
 **4:1 (enunciado)** (λ_j/RT y prueba de fase de C(s)):
@@ -157,11 +146,9 @@ reintenta desde el gas del R anterior y queda Locally Optimal; el CNS da Solved 
 1. **S28, diapositiva del ejemplo:** dice "4:1" pero escribe los balances C = 2, H = 14,
    O = 3, que son los de 2 CH4 + 3 H2O (SVA Ej. 13.14). Con 4:1 son C = 1, H = 12, O = 4. Se
    resolvieron ambos.
-2. **S27, ΔG de la maestra para C2–C15:** no coinciden con la termodinámica tabulada. Contra
-   `dGf_sva` (SVA ec. 13.18) difieren de −23.5 kJ/mol (C2) a −95.5 kJ/mol (C8); la maestra
-   sube 16.3 kJ/mol por CH2 y SVA ~28 kJ/mol. C1, CO, CO2 y H2O sí son ΔfG de JANAF a 500 K
-   (redondeados). La conclusión de la Pregunta A no cambia (con datos reales las cadenas
-   largas son aún menos estables), pero los números sí.
+   **Resuelto (17-nov-2026):** la maestra confirmó 4:1 (C = 1, H = 12, O = 4); ese es el caso que se entrega. El 2:3 queda solo como referencia.
+2. **S27, ΔG a 500 K y φ:** Datos de la maestra (Sesión 27), confirmados por ella el
+   17-nov-2026; se usan tal cual.
 3. **S27, % en peso con ASF:** la referencia da C12–C15 = 15.30; el valor exacto es 15.2892
    (15.29). 15.30 sale de cerrar la suma a 100 con los otros tres ya redondeados.
 4. **S27:** con los datos de la maestra, el grafito sería estable (a_C > 1) en casi todas las

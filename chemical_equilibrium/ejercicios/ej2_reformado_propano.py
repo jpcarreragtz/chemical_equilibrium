@@ -4,6 +4,7 @@ Método A (avance de reacción), 3 reacciones simultáneas."""
 
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))  # raíz del proyecto
+import core.entorno  # noqa: F401
 
 from core.equilibrium import (conversion, format_table, run_checks_method_a,
                          selectivity, solve_extents, yield_fraction)

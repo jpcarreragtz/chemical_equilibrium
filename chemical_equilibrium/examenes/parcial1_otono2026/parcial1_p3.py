@@ -18,6 +18,7 @@ import sys
 
 _DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))  # raíz del proyecto
+import core.entorno  # noqa: F401
 
 import numpy as np
 
