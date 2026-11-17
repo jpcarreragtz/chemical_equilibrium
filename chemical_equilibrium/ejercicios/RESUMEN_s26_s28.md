@@ -72,8 +72,6 @@ simular combustibles líquidos en FT porque predice metano; el producto real es 
 distribución ASF que el catalizador produce lejos del equilibrio entre parafinas. Hay que
 imponer la ASF (u otro modelo cinético) como restricción.
 
-Grafito: Δ_C < 0 (a_C > 1) en 10 de las 12 corridas, así que a 500 K y 25 bar el C(s) bajaría G. La maestra no lo incluye; los resultados son solo-gas y metaestables frente a C(s). Solo el gas natural con ASF da a_C < 1.
-
 ## S28 — Reformado por Lagrange (Koretsky 9.45–9.47, sistema explícito)
 
 **4:1 (enunciado)** (λ_j/RT y prueba de fase de C(s)):
@@ -149,10 +147,6 @@ reintenta desde el gas del R anterior y queda Locally Optimal; el CNS da Solved 
    **Resuelto (17-nov-2026):** la maestra confirmó 4:1 (C = 1, H = 12, O = 4); ese es el caso que se entrega. El 2:3 queda solo como referencia.
 2. **S27, ΔG a 500 K y φ:** Datos de la maestra (Sesión 27), confirmados por ella el
    17-nov-2026; se usan tal cual.
-3. **S27, % en peso con ASF:** la referencia da C12–C15 = 15.30; el valor exacto es 15.2892
-   (15.29). 15.30 sale de cerrar la suma a 100 con los otros tres ya redondeados.
-4. **S27:** con los datos de la maestra, el grafito sería estable (a_C > 1) en casi todas las
-   corridas; el problema no lo considera.
 
 ## Lo que no se pudo verificar
 

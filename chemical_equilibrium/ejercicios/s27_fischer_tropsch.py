@@ -24,10 +24,8 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))  # raíz del proyecto
 import core.entorno  # noqa: F401
 
-import numpy as np
-
 from core import DATA
-from core.gibbs import minimizar_gibbs, prueba_de_fase, validar_gibbs
+from core.gibbs import minimizar_gibbs, validar_gibbs
 
 SI_NO = {True: "sí", False: "no"}   # etiquetas; compatible con Python < 3.12
 
@@ -81,6 +79,8 @@ def pct_peso_asf_analitico(alfa):
     return pct_peso({sp: alfa ** (NCARB[sp] - 1) for sp in PARAFINAS})
 
 
+NOTA_CARBONO = "el modelo de la maestra no incluye C(s)"   # punto 7 de validar_gibbs: n/a
+
 # %% 1. Las 12 corridas: 3 alimentaciones × ASF sí/no × φ sí/no
 RES, VALID = {}, {}
 for nombre, b in ALIMENTACIONES.items():
@@ -90,7 +90,7 @@ for nombre, b in ALIMENTACIONES.items():
                                 phi=PHI if con_phi else None,
                                 restricciones=restricciones_asf(ALFA) if asf else None)
             with contextlib.redirect_stdout(io.StringIO()):
-                VALID[(nombre, asf, con_phi)] = validar_gibbs(r, n_arranques=5)
+                VALID[(nombre, asf, con_phi)] = validar_gibbs(r, n_arranques=5, nota_carbono=NOTA_CARBONO)
             RES[(nombre, asf, con_phi)] = r
 
 
@@ -154,13 +154,11 @@ predeciría metano, cuando el producto real es la distribución cinética (ASF) 
 catalizador produce lejos del equilibrio entre parafinas. Hay que imponer la ASF (u otro
 modelo cinético) como restricción.""")
 
-# %% 4. Validación y carbono
-titulo("Validación (7 puntos + restricciones) y prueba de fase del grafito")
+# %% 4. Validación
+titulo("Validación (7 puntos + restricciones)")
 print("Con ASF el punto 4 (K) es n/a: el equilibrio está restringido.")
+print(f"El punto 7 (a_C) es n/a: {NOTA_CARBONO}.")
 for clave, v in VALID.items():
     nombre, asf, con_phi = clave
-    d_c = prueba_de_fase(RES[clave], "C(s)", 0.0)
     print(f"  {f'{nombre}, ASF {SI_NO[bool(asf)]}, φ {SI_NO[bool(con_phi)]}':<46}"
-          f"{v.n_pass} PASS {v.n_warn} WARN {v.n_fail} FAIL;  Δ_C = {d_c:+.3f} (a_C = {np.exp(-d_c):.3g})")
-print("El WARN es el punto 7: a_C > 1. A 500 K y 25 bar el grafito (2 CO -> C + CO2) bajaría G;")
-print("la maestra no lo incluye, así que estos equilibrios son solo-gas, metaestables frente a C(s).")
+          f"{v.n_pass} PASS {v.n_warn} WARN {v.n_fail} FAIL")

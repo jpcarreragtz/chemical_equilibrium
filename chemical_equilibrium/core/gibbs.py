@@ -437,7 +437,8 @@ def reacciones_independientes(res: ResultadoGibbs
 
 
 def validar_gibbs(res: ResultadoGibbs, n_arranques: int = 20,
-                  semilla: int = 0, tol: float = 1e-7) -> Report:
+                  semilla: int = 0, tol: float = 1e-7,
+                  nota_carbono: Optional[str] = None) -> Report:
     """
     Autovalidación, sin clave de respuestas:
       1. balance de átomos in/out
@@ -446,7 +447,9 @@ def validar_gibbs(res: ResultadoGibbs, n_arranques: int = 20,
       4. K de cada reacción independiente: ln K(ΔG°) vs Σ ν ln(y φ P/P0)
       5. robustez: mismas ln y (trazas incluidas) desde arranques al azar
       6. nG/RT baja respecto a la alimentación
-      7. carbono: a_C < 1, o el resultado solo-gas no es estable
+      7. carbono: a_C < 1, o el resultado solo-gas no es estable. Con
+         `nota_carbono` (p. ej. "el modelo de la maestra no incluye C(s)")
+         el punto sale como n/a con esa nota; sin ella, como siempre.
     Solo si aplican:
       8. restricciones extra: Σ coef·n = rhs (con ellas el punto 4 es n/a,
          porque el equilibrio está restringido y las K no se cumplen)
@@ -546,7 +549,9 @@ def validar_gibbs(res: ResultadoGibbs, n_arranques: int = 20,
     A_act, elem_act = matriz_atomica(especies)
     lleno = rango(A_act) == len(elem_act)      # si no, λ no es única
     carbono = [k for k in res.n_cond if _composicion(k) == {"C": 1}]
-    if carbono:
+    if nota_carbono:
+        rep.add("na", 7, nota_carbono)
+    elif carbono:
         rep.add("pass", 7, f"{carbono[0]} presente: a_C = "
                 f"{float(np.exp(-res.lam_RT['C'])):.6g}")
     elif "C" in res.lam_RT and lleno:
