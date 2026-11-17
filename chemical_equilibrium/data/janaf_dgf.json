@@ -1,18 +1,25 @@
 {
   "_meta": {
-    "descripcion": "ΔG°f (J/mol) de gases ideales, por temperatura, leídos de las tablas NIST-JANAF.",
+    "descripcion": "ΔG°f (J/mol) por temperatura, leídos de las tablas NIST-JANAF. Gases ideales y, con la fase en el nombre, sólidos y líquidos de referencia (ΔfG = 0).",
     "fuente": "https://janaf.nist.gov/ (columna delta-f G°, kJ/mol × 1000)",
-    "fecha_consulta": "2026-11-05",
+    "fecha_consulta": "2026-11-05; 500–1100 K, H2S, SO2, S2 y fases de referencia: 2026-11-17",
+    "verificacion": "Cada valor de 2026-11-17 cotejado contra −RT·ln(10)·log Kf de la misma tabla (|Δ| ≤ 0.018 kJ/mol).",
     "no_en_janaf": {
       "C2H6": "No aparece en el índice de fórmulas de JANAF: usar core.gibbs.dGf_sva (Tablas C.1, C.2 y C.4 de SVA)."
     }
   },
-  "CH4":  {"tabla": "C-067", "1000": 19492},
-  "H2O":  {"tabla": "H-064", "1000": -192590},
-  "CO":   {"tabla": "C-093", "1000": -200275},
-  "CO2":  {"tabla": "C-095", "1000": -395886},
-  "C2H2": {"tabla": "C-127", "1000": 169607},
-  "C2H4": {"tabla": "C-128", "1000": 119122},
-  "H2":   {"tabla": "referencia", "1000": 0},
-  "O2":   {"tabla": "referencia", "1000": 0}
+  "CH4":    {"tabla": "C-067", "600": -22887, "700": -12643, "800": -2115, "900": 8616, "1000": 19492, "1100": 30472},
+  "H2O":    {"tabla": "H-064", "500": -219051, "600": -214007, "700": -208812, "800": -203496, "900": -198083, "1000": -192590, "1100": -187033},
+  "CO":     {"tabla": "C-093", "600": -164486, "700": -173518, "800": -182497, "900": -191416, "1000": -200275, "1100": -209075},
+  "CO2":    {"tabla": "C-095", "600": -395182, "700": -395398, "800": -395586, "900": -395748, "1000": -395886, "1100": -396001},
+  "C2H2":   {"tabla": "C-127", "1000": 169607},
+  "C2H4":   {"tabla": "C-128", "1000": 119122},
+  "H2S":    {"tabla": "H-080", "500": -40179, "700": -44201},
+  "SO2":    {"tabla": "O-034", "500": -300871, "700": -299444},
+  "S2":     {"tabla": "S-012", "500": 49019, "700": 22562},
+  "H2":     {"tabla": "referencia", "500": 0, "600": 0, "700": 0, "800": 0, "900": 0, "1000": 0, "1100": 0},
+  "O2":     {"tabla": "referencia", "500": 0, "600": 0, "700": 0, "800": 0, "900": 0, "1000": 0, "1100": 0},
+  "C(s)":   {"tabla": "C-002", "600": 0, "700": 0, "800": 0, "900": 0, "1000": 0, "1100": 0},
+  "S(ref)": {"tabla": "S-001", "500": 0, "700": 0},
+  "Si(s)":  {"tabla": "Si-001", "1300": 0}
 }

@@ -35,12 +35,18 @@ Si un ejercicio necesita ΔG°f y JANAF aplica, los datos se consultan en el mom
 
 ## Minimización de la energía de Gibbs
 
-Implementación en `core/gibbs.py`: `minimizar_gibbs` (RAND en ln n_i, sin valor inicial), `validar_gibbs` (7 puntos), `reacciones_independientes` y `cargar_dgf`.
+Implementación en `core/gibbs.py`: `minimizar_gibbs` (RAND en ln n_i, sin valor inicial), `validar_gibbs` (7 puntos, más el 8 y el 9 cuando aplican), `reacciones_independientes`, `prueba_de_fase` y `cargar_dgf`.
 
 ΔG°f: `cargar_dgf` usa `data/janaf_dgf.json`, capturado de https://janaf.nist.gov/. Una especie o T nueva se agrega ahí con su tabla. La ec. 13.18 de SVA (`dGf_sva`) solo se usa para especies declaradas en `no_en_janaf`, como C2H6.
 
-Alcance: una fase gaseosa con φ_i constante. No aplica con φ_i dependiente de y, ni con sólidos o líquidos.
+Alcance: una fase gaseosa ideal con φ_i constante, más restricciones lineales extra y fases condensadas puras. No aplica con φ_i dependiente de y, ni con soluciones líquidas.
 
-GAMS: minimizar no basta para las trazas, porque casi no pesan en G y el solver se detiene aunque reporte "Locally Optimal". Se usa ln n_i como variable y una segunda etapa CNS con las condiciones de Lagrange, como en `ejercicios/s25_ej2_gibbs.gms`. No se deja el límite inferior en 0, porque ln(0) detiene el solve.
+Restricciones extra (S27): `restricciones=[({especie: coef}, rhs), ...]` se agregan como filas a A n = b dentro de RAND, cada una con su multiplicador (`res.lam_restr`). Ejemplo, ASF: n_Ck − α^(k−1)·n_C1 = 0. Con restricciones, `validar_gibbs` incluye sus multiplicadores en el punto 3 (Lagrange), marca el punto 4 (K) como n/a porque el equilibrio está restringido, y verifica cada restricción en el punto 8.
+
+Fases condensadas puras y prueba de fase (S28): `condensadas=["C(s)", "Si(s)", "S(ref)", "H2O(l)", ...]`, con la fase en el nombre y su ΔG°f en `dGf` (las de referencia valen 0: JANAF C-002, S-001, Si-001). El procedimiento: (1) se resuelve solo el gas; (2) con sus λ, Δ_k = g_k/RT + Σ_e A_ek λ_e/RT, con la convención del Ejemplo 13.14 (λ_C/RT = 0.7635); (3) si Δ_k < 0, la fase entra con g_k/RT + Σ A λ = 0 y n_k ≥ 0, y se recalcula; (4) si n_k sale negativo, se quita. Sirve para fases de uno o varios elementos, siempre que sus elementos estén en alguna especie gaseosa. `res.delta_fase_gas` y `res.delta_fase` guardan Δ_k (solo gas y final), `res.n_cond` los moles presentes, y el punto 9 de `validar_gibbs` reporta todo. `prueba_de_fase(res, especie, dGf)` devuelve Δ_k sin recalcular. Para el grafito, Δ_C = λ_C/RT = −ln a_C.
+
+Límite conocido del Newton RAND: desde algunos arranques al azar se estanca si una especie mayoritaria arranca como traza (por ejemplo el O2 en H2S:O2 = 1:2). Desde el reparto uniforme converge. `validar_gibbs` lo reporta como WARN en el punto 5, no como FAIL. Tampoco converge si dos elementos solo se distinguen por trazas menores a ~1e-16 (p. ej. H y O cuando solo hay H2O y trazas de H2 y O2).
+
+GAMS: minimizar no basta para las trazas, porque casi no pesan en G y el solver se detiene aunque reporte "Locally Optimal". Se usa ln n_i como variable y una segunda etapa CNS con las condiciones de Lagrange, como en `ejercicios/s25_ej2_gibbs.gms`. No se deja el límite inferior en 0, porque ln(0) detiene el solve. Por la misma razón, una plantilla con y.lo = 1e-8 (como la de la maestra) deja en 1e-8 toda traza cuyo valor real sea menor: el solver para en la cota. Se usa `lnn.lo = -700`. Los `.gms` de S26–S28 escriben un CSV solo si se pasa `--salida=archivo.csv`; en el `put` va `.nz = 0`, porque si no, los valores menores a 1e-5 salen como 0.
 
 Licencias: los `.gms` corren con la licencia Free Personal, vigente hasta el 30-nov-2027. Se usa IPOPT en NLP y CNS porque corre sin restricción; CONOPT y otros solvers comerciales corren ahí en modo demo. CONOPT sin modo demo requiere GAMSPy con la licencia Free Academic GAMSPy, que no ejecuta `.gms`.

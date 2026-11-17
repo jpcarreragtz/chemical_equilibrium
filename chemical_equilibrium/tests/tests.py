@@ -32,6 +32,13 @@ Casos:
      [I | Z] con fracciones, ν por columnas y reacciones
   u) Minimización de Gibbs (S25, core/gibbs.py): SVA Ej. 13.14, contraste con
      Método A, steam cracker, trazas, presión, φ, sin arranque y errores
+  v) S26: reformado 4:1 de 600 a 1100 K (KKT, Método A, balance, referencias),
+     2:3 = s25_ej1, y H2S + O2 (6 casos, λ_S)
+  w) S27 Fischer–Tropsch: ASF exacta, balance, % en peso analítico, sin ASF
+     casi todo C1, referencias
+  x) S28: Si epitaxial por Lagrange vs s24_ej3, R mínimo, signo de la prueba de
+     fase, Δ_C = −ln a_C, fase inestable rechazada y fase con n < 0 quitada,
+     H2O(l) analítico, sistema de Lagrange explícito
 """
 
 from __future__ import annotations
@@ -1110,14 +1117,250 @@ def caso_u():
             lambda: minimizar_gibbs(ref, dGf, {"Ar": 1.0}, T))
     rechaza("rechaza ΔG°f faltante", KeyError,
             lambda: minimizar_gibbs(ref, {"CH4": 0.0}, alim, T))
-    rechaza("pide JANAF si falta la T", KeyError,
-            lambda: cargar_dgf(["CH4"], 900.0))
+    rechaza("pide JANAF si falta la T", KeyError,      # 950 K: fuera de la malla
+            lambda: cargar_dgf(["CH4"], 950.0))        # de 100 K (900 K ya está)
+
+
+def _coincide_ref(valor: float, ref: str) -> bool:
+    """¿`valor` redondeado a las cifras de `ref` ("1.6951e-01") da `ref`?
+    Tolerancia: media unidad en la última cifra dada."""
+    mant = ref.lower().split("e")[0].replace("-", "").replace(".", "").lstrip("0")
+    cifras = max(len(mant), 1)
+    r = float(ref)
+    return abs(valor - r) <= 0.5 * 10 ** (-(cifras - 1)) * abs(r) * 1.0001 + 1e-300
+
+
+def _check_ref(label: str, valor: float, ref: str) -> None:
+    ok = _coincide_ref(valor, ref)
+    print(f"  [{'PASS' if ok else 'FAIL'}] {label}: obtenido {valor:.6g}, "
+          f"referencia {ref}")
+    if not ok:
+        FALLAS.append(label)
+
+
+# ---------------------------------------------------------------- caso v
+def caso_v():
+    head("v) S26: reformado 4:1 (600–1100 K), 2:3 = s25_ej1, y H2S + O2")
+    import contextlib, io
+    from core.gibbs import minimizar_gibbs, prueba_de_fase, validar_gibbs
+    ej = cargar_ejercicio("s26_ej1_reformado_gibbs_barrido")
+    REF = {600: "1.6951e-01 7.2168e-01 9.2173e-05 2.1689e-02 8.7031e-02 5.2277 0.2277",
+           700: "1.2379e-01 6.0602e-01 1.9773e-03 5.2455e-02 2.1575e-01 5.6108 0.3029",
+           800: "6.1639e-02 4.6032e-01 1.6108e-02 8.2721e-02 3.7921e-01 6.2318 0.3119",
+           900: "1.2034e-02 3.6586e-01 4.9203e-02 8.5059e-02 4.8784e-01 6.8355 0.1599",
+           1000: "9.2291e-04 3.5806e-01 6.9969e-02 7.2229e-02 4.9882e-01 6.9871 0.0387",
+           1100: "8.3675e-05 3.6785e-01 8.1922e-02 6.0876e-02 4.8927e-01 6.9988 0.0098"}
+    for T, fila in REF.items():
+        r = ej.RESULTADOS[T]
+        v = fila.split()
+        malos = [sp for sp, ref in zip(ej.ESPECIES, v[:5]) if not _coincide_ref(r.y[sp], ref)]
+        malos += ["n_T"] if not _coincide_ref(r.n_total, v[5]) else []
+        malos += ["a_C"] if not _coincide_ref(float(np.exp(-ej.DELTA_C[T])), v[6]) else []
+        ok = not malos
+        print(f"  [{'PASS' if ok else 'FAIL'}] 4:1 {T} K: y_i, n_T y a_C = referencia"
+              + ("" if ok else f" (difieren {', '.join(malos)})"))
+        if not ok:
+            FALLAS.append(f"S26 ref {T}")
+        val = ej.VALIDACION[T]
+        igual(f"4:1 {T} K: validar_gibbs sin FAIL (KKT, K, balance)", val.n_fail, 0)
+        conv, dif = ej.METODO_A[T]
+        igual(f"4:1 {T} K: Método A convergió", conv, True)
+        check(f"4:1 {T} K: máx |Δ ln y| vs Método A", dif, 0, atol=1e-8)
+        check(f"4:1 {T} K: Δ_C > 0 (sin grafito)", float(ej.DELTA_C[T] > 0), 1, atol=0)
+    # KKT y balance recalculados aquí, sin validar_gibbs
+    r = ej.RESULTADOS[800]
+    A = {"CH4": {"C": 1, "H": 4}, "H2O": {"H": 2, "O": 1}, "CO": {"C": 1, "O": 1},
+         "CO2": {"C": 1, "O": 2}, "H2": {"H": 2}}
+    kkt = max(abs(ej.DGF[800][sp] / (R_J * 800) + np.log(r.y[sp])
+                  + sum(c * r.lam_RT[el] for el, c in A[sp].items())) for sp in A)
+    check("4:1 800 K: KKT recalculado en la prueba", kkt, 0, atol=1e-9)
+    bal = max(abs(sum(A[sp].get(el, 0) * r.n[sp] for sp in A) - b)
+              for el, b in (("C", 1), ("H", 12), ("O", 4)))
+    check("4:1 800 K: balance de C, H, O", bal, 0, atol=1e-10)
+    # 2:3 a 1000 K reproduce s25_ej1 (JANAF)
+    s25 = cargar_ejercicio("s25_ej1_gibbs_reformado")
+    r23 = minimizar_gibbs(ej.ESPECIES, ej.DGF[1000], {"CH4": 2.0, "H2O": 3.0}, 1000.0)
+    check("2:3 1000 K = s25_ej1: máx |Δ y|",
+          max(abs(r23.y[sp] - s25.res.y[sp]) for sp in ej.ESPECIES), 0, atol=1e-12)
+    for sp, ref in zip(ej.ESPECIES, "0.0202 0.0988 0.1741 0.0369 0.6700".split()):
+        _check_ref(f"2:3 1000 K: y_{sp}", r23.y[sp], ref)
+    for el, ref in (("C", "0.7586"), ("H", "0.2002"), ("O", "25.0785")):
+        _check_ref(f"2:3 1000 K: λ_{el}/RT", r23.lam_RT[el], ref)
+    # H2S + O2
+    h = cargar_ejercicio("s26_ej3_h2s_o2_gibbs")
+    REF3 = {"a 500 K 1 bar 2:1":  "4.3801e-01 1.0936e-34 3.0166e-01 2.1901e-01 4.1326e-02 3.7598e-07 2.7039",
+            "a 700 K 1 bar 2:1":  "3.1063e-01 2.8400e-24 4.0773e-01 1.5535e-01 1.2622e-01 6.3301e-05 2.7839",
+            "b 500 K 5 bar 2:1":  "4.5744e-01 6.1643e-35 2.8546e-01 2.2872e-01 2.8372e-02 2.1193e-07 2.6921",
+            "b 500 K 10 bar 2:1": "4.6426e-01 4.8274e-35 2.7978e-01 2.3213e-01 2.3826e-02 1.6597e-07 2.6880",
+            "c 500 K 1 bar 1:1":  "1.8268e-01 3.5599e-34 4.1485e-01 3.9010e-01 1.2373e-02 2.8658e-07 1.6736",
+            "c 500 K 1 bar 1:2":  "1.36e-50 2.0000e-01 4.0000e-01 4.0000e-01 4.12e-68 1.17e-23 2.5000"}
+    for caso, fila in REF3.items():
+        r = h.RESULTADOS[caso]
+        v = fila.split()
+        malos = [sp for sp, ref in zip(h.ESPECIES, v[:6]) if not _coincide_ref(r.y[sp], ref)]
+        malos += ["n_T"] if not _coincide_ref(r.n_total, v[6]) else []
+        ok = not malos
+        print(f"  [{'PASS' if ok else 'FAIL'}] H2S/O2 {caso}: y_i (trazas incluidas) y n_T = "
+              "referencia" + ("" if ok else f" (difieren {', '.join(malos)})"))
+        if not ok:
+            FALLAS.append(f"S26 H2S {caso}")
+        igual(f"H2S/O2 {caso}: validar_gibbs sin FAIL", h.VALIDACION[caso].n_fail, 0)
+    _check_ref("H2S/O2 a 500 K: λ_S/RT", h.RESULTADOS["a 500 K 1 bar 2:1"].lam_RT["S"], "-4.303")
+    _check_ref("H2S/O2 a 700 K: λ_S/RT", h.RESULTADOS["a 700 K 1 bar 2:1"].lam_RT["S"], "-0.904")
+    check("H2S/O2 a 500 K: Δ_S(ref) = λ_S/RT",
+          prueba_de_fase(h.RESULTADOS["a 500 K 1 bar 2:1"], "S(ref)", 0.0),
+          h.RESULTADOS["a 500 K 1 bar 2:1"].lam_RT["S"], atol=1e-12)
+    igual("H2S/O2 1:2: el WARN del punto 5 no es FAIL", h.VALIDACION["c 500 K 1 bar 1:2"].n_fail, 0)
+
+
+# ---------------------------------------------------------------- caso w
+def caso_w():
+    head("w) S27 Fischer–Tropsch: ASF, balance, % en peso y referencias")
+    ft = cargar_ejercicio("s27_fischer_tropsch")
+    BASE, BIO, GN = list(ft.ALIMENTACIONES)
+    par, nc = ft.PARAFINAS, ft.NCARB
+    for clave, r in ft.RES.items():
+        if not clave[1]:
+            continue
+        err = max(abs(r.n[sp] / r.n[par[0]] - ft.ALFA ** (nc[sp] - 1)) for sp in par)
+        check(f"ASF exacta {clave[0][:10]}, φ {'sí' if clave[2] else 'no'}: "
+              "máx |n_Ck/n_C1 − α^(k−1)|", err, 0, atol=1e-10)
+    peor_bal = 0.0
+    for (nombre, asf, phi), r in ft.RES.items():
+        b = ft.ALIMENTACIONES[nombre]
+        sale = {"C": sum(nc.get(sp, 0) * r.n[sp] for sp in par) + r.n["CO2"] + r.n["CO"],
+                "H": sum((2 * nc[sp] + 2) * r.n[sp] for sp in par) + 2 * r.n["H2O"] + 2 * r.n["H2"],
+                "O": 2 * r.n["CO2"] + r.n["H2O"] + r.n["CO"]}
+        peor_bal = max(peor_bal, max(abs(sale[el] - b[el]) for el in "CHO"))
+    check("balance de C, H, O en las 12 corridas (máx |Δ|)", peor_bal, 0, atol=1e-10)
+    w_an = ft.pct_peso_asf_analitico(ft.ALFA)
+    peor = max(abs(ft.pct_peso(r.n)[g] - w_an[g]) for (n, asf, phi), r in ft.RES.items()
+               if asf for g in w_an)
+    check("% en peso con ASF = analítico, en las 3 alimentaciones con y sin φ", peor, 0, atol=1e-8)
+    for g, ref in zip(w_an, ("5.15", "26.37", "53.18")):
+        _check_ref(f"% en peso ASF {g}", w_an[g], ref)
+    check("% en peso ASF C12–C15 (15.2892; la referencia 15.30 cierra la suma a 100)",
+          w_an["C12–C15"], 15.29, atol=0.005)
+    for (nombre, asf, phi), r in ft.RES.items():
+        if asf:
+            continue
+        c5 = sum(r.n[sp] for sp in par if nc[sp] >= 5)
+        ok = r.y["CH4"] > 0.47 and c5 < 1e-6
+        print(f"  [{'PASS' if ok else 'FAIL'}] sin ASF {nombre[:12]}, φ {'sí' if phi else 'no'}: "
+              f"y_C1 = {r.y['CH4']:.4f} > 0.47 y C5–C15 = {c5:.2e} < 1e-6 mol")
+        if not ok:
+            FALLAS.append("FT sin ASF")
+    REF = {(BASE, False, False): "0.74542 0.25001 0.49996 3.04e-11",
+           (BASE, False, True):  "0.74508 0.24992 0.50015 4.94e-11",
+           (BASE, True, False):  "0.043117 0.073776 0.85244 0.080718",
+           (BASE, True, True):   "0.043135 0.073379 0.85323 0.080753",
+           (BIO, True, True):    "0.028837 0.38051 0.23895 0.053985",
+           (GN, True, True):     "0.046551 7.30e-06 0.99999 0.087147"}
+    for clave, fila in REF.items():
+        r = ft.RES[clave]
+        vals = (r.n["CH4"], r.n["CO2"], r.n["H2O"], sum(r.n[sp] for sp in par if nc[sp] >= 5))
+        malos = [k for k, v, ref in zip(("CH4", "CO2", "H2O", "C5–C15"), vals, fila.split())
+                 if not _coincide_ref(v, ref)]
+        ok = not malos
+        print(f"  [{'PASS' if ok else 'FAIL'}] FT {clave[0][:12]}, ASF {'sí' if clave[1] else 'no'}, "
+              f"φ {'sí' if clave[2] else 'no'}: n CH4, CO2, H2O, C5–C15 = referencia"
+              + ("" if ok else f" (difieren {', '.join(malos)})"))
+        if not ok:
+            FALLAS.append(f"FT ref {clave}")
+    _check_ref("FT gas natural, ASF y φ: H2 libre", ft.RES[(GN, True, True)].n["H2"], "0.2755")
+    w0 = ft.pct_peso(ft.RES[(BASE, False, False)].n)
+    for g, ref in zip(w0, ("99.43", "0.57")):
+        _check_ref(f"% en peso sin ASF {g}", w0[g], ref)
+    v = ft.VALID[(BASE, True, True)]
+    igual("FT con ASF: validar sin FAIL (punto 4 n/a, punto 8 restricciones)", v.n_fail, 0)
+
+
+# ---------------------------------------------------------------- caso x
+def caso_x():
+    head("x) S28: Si por Lagrange, R mínimo, prueba de fase, H2O(l) y Lagrange explícito")
+    import contextlib, io, re
+    from core.gibbs import cargar_dgf, minimizar_gibbs, prueba_de_fase, validar_gibbs
+    si = cargar_ejercicio("s28_si_epitaxial_lagrange")
+    s24 = si.S24
+    dif = max(abs(r.n_cond.get("Si(s)", 0.0) - s24.RESULTADOS[k]["n_Si"])
+              for k, r in si.RESULTADOS.items())
+    check("Si: máx |n_Si(s) Lagrange − s24_ej3| en 28 puntos (R 8.314 vs 8.314462618)",
+          dif, 0, atol=1e-4)
+    for cl, refs in (("SiCl4", "0 0 0.01537 0.09780 0.29284 0.50228 0.62914"),
+                     ("SiCl3H", "0.21309 0.24412 0.28708 0.36416 0.53374 0.69611 0.78325")):
+        for R, ref in zip((1, 5, 10, 20, 50, 100, 150), refs.split()):
+            check(f"Si: n_Si(s) {cl}, R = {R}", si.RESULTADOS[(cl, R)].n_cond.get("Si(s)", 0.0),
+                  float(ref), atol=1e-4)
+    check("Si: R mínimo SiCl4", si.R_MIN, 8.2327, atol=0.01)
+    for R, ref in zip((1, 5, 10, 20, 50, 100, 150),
+                      ("1.442", "0.374", "-0.149", "-0.695", "-1.452", "-2.055", "-2.417")):
+        _check_ref(f"Si: prueba de fase (gas solo) SiCl4, R = {R}",
+                   si.RESULTADOS[("SiCl4", R)].delta_fase_gas["Si(s)"], ref)
+    ok = all(si.RESULTADOS[("SiCl4", R)].delta_fase_gas["Si(s)"] > 0
+             and "Si(s)" not in si.RESULTADOS[("SiCl4", R)].n_cond for R in (1, 2, 3, 5))
+    ok &= all(si.RESULTADOS[("SiCl4", R)].delta_fase_gas["Si(s)"] < 0
+              and "Si(s)" in si.RESULTADOS[("SiCl4", R)].n_cond
+              for R in si.RELACIONES if R >= 10)
+    print(f"  [{'PASS' if ok else 'FAIL'}] Si: SiCl4 con R ≤ 5 -> Δ > 0 y sin sólido; "
+          "R ≥ 10 -> Δ < 0 y con sólido")
+    if not ok:
+        FALLAS.append("signo prueba de fase")
+    igual("Si: validar sin FAIL en los 28 puntos",
+          sum(v.n_fail for v in si.VALIDACION.values()), 0)
+    # Δ_C de la prueba de fase = −ln a_C del punto 7 de validar_gibbs
+    sp = ["CH4", "H2O", "CO", "CO2", "H2"]
+    dg, _ = cargar_dgf(sp + ["C(s)"], 1000.0)
+    r = minimizar_gibbs(sp, dg, {"CH4": 2.0, "H2O": 3.0}, 1000.0)
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        validar_gibbs(r, n_arranques=2)
+    a_c = float(re.search(r"a_C = ([0-9.eE+-]+)", buf.getvalue()).group(1))
+    d_c = prueba_de_fase(r, "C(s)", dg)
+    check("Δ_C (prueba_de_fase) = −ln a_C (punto 7 de validar, 3 cifras)",
+          np.exp(-d_c), a_c, rtol=5e-3)
+    # fase inestable rechazada; fase forzada con n < 0 quitada
+    rc = minimizar_gibbs(sp, dg, {"CH4": 2.0, "H2O": 3.0}, 1000.0, condensadas=["C(s)"])
+    igual("prueba de fase rechaza C(s) inestable (Δ_C > 0): sin sólido", rc.n_cond, {})
+    check("  y Δ_C final = λ_C/RT > 0", rc.delta_fase["C(s)"], 0.7586, atol=1e-4)
+    rf = minimizar_gibbs(sp, dg, {"CH4": 2.0, "H2O": 3.0}, 1000.0, condensadas=["C(s)"],
+                         fases_iniciales=["C(s)"])
+    ok = rf.n_cond == {} and any("se quita" in b for b in rf.bitacora_fases)
+    print(f"  [{'PASS' if ok else 'FAIL'}] C(s) forzada: n < 0 y se quita "
+          f"({'; '.join(rf.bitacora_fases)})")
+    if not ok:
+        FALLAS.append("fase con n < 0")
+    check("  y el resultado es el del gas solo (máx |Δ y|)",
+          max(abs(rf.y[s] - r.y[s]) for s in sp), 0, atol=1e-12)
+    # fase que sí entra (H2O:CH4 = 1:1 a 800 K) y fase de varios elementos, H2O(l)
+    d8, _ = cargar_dgf(sp + ["C(s)"], 800.0)
+    r8 = minimizar_gibbs(sp, d8, {"CH4": 1.0, "H2O": 1.0}, 800.0, condensadas=["C(s)"])
+    check("C(s) entra con H2O:CH4 = 1:1 a 800 K: n_C", r8.n_cond.get("C(s)", 0.0), 0.14511, atol=1e-5)
+    with contextlib.redirect_stdout(io.StringIO()):
+        v8 = validar_gibbs(r8, n_arranques=5)
+    igual("  validar sin FAIL (punto 9: fases)", v8.n_fail, 0)
+    T, gv = 350.0, -50000.0
+    d3 = {"H2O": gv, "H2": 0.0, "O2": 0.0, "N2": 0.0, "H2O(l)": gv + R_J * T * np.log(0.4)}
+    rl = minimizar_gibbs(["H2O", "H2", "O2", "N2"], d3, {"H2O": 1, "N2": 1}, T,
+                         condensadas=["H2O(l)"])
+    check("H2O(l) (Psat = 0.4 bar): y_H2O = Psat/P", rl.y["H2O"], 0.4, atol=1e-12)
+    check("H2O(l): Δ solo gas = ln(Psat/(y·P)) con y ≈ 0.5", rl.delta_fase_gas["H2O(l)"],
+          np.log(0.4 / 0.5), atol=1e-4)
+    rl2 = minimizar_gibbs(["H2O", "H2", "O2", "N2"], d3, {"H2O": 1, "N2": 4}, T,
+                          condensadas=["H2O(l)"])
+    igual("H2O(l) con y = 0.2 < Psat: no condensa", rl2.n_cond, {})
+    # sistema de Lagrange explícito (scipy.root) vs RAND
+    lg = cargar_ejercicio("s28_lagrange_reformado")
+    check("Lagrange explícito vs RAND: máx |Δ ln y| (4:1 y 2:3, 600–1100 K)",
+          max(v["dif"] for v in lg.RESULTADOS.values()), 0, atol=1e-8)
+    check("Lagrange explícito: máx residuo", max(v["final"]["res"] for v in lg.RESULTADOS.values()),
+          0, atol=1e-10)
 
 
 if __name__ == "__main__":
     for f in (caso_a, caso_b, caso_c, caso_d, caso_e, caso_f, caso_g,
               caso_h, caso_i, caso_j, caso_k, caso_l, caso_m, caso_n, caso_o,
-              caso_p, caso_q, caso_r, caso_s, caso_t, caso_u):
+              caso_p, caso_q, caso_r, caso_s, caso_t, caso_u,
+              caso_v, caso_w, caso_x):
         f()
     print(f"\n{'=' * 72}")
     if FALLAS:

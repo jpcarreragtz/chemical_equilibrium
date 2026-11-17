@@ -18,21 +18,29 @@ chemical_equilibrium/
 │   ├── convenciones.py          # ÚNICO lugar que decide cómo entra K_phi: "maestra" (default) | "rigurosa"
 │   ├── energia.py               # 2do parcial: balance de energía con reacción, HHV/LHV, T flama adiabática
 │   ├── exercise.py              # motor de plantilla: run_exercise(...)
-│   ├── gibbs.py                 # S25: minimización de G sin reacciones ni valor inicial (RAND), datos y validación
+│   ├── gibbs.py                 # S25–S28: minimización de G sin reacciones ni valor inicial (RAND), restricciones extra (ASF), fases condensadas con prueba de fase, datos y validación
 │   └── selfcheck.py             # 12 puntos de autovalidación (validate, sweep)
 ├── data/
 │   ├── sva_tables.json          # Smith–Van Ness C.1/C.4, 42 especies verificadas
 │   ├── criticas_b1.json         # Tc, Pc, ω (Tabla B.1) para phi de Pitzer
-│   ├── janaf_dgf.json           # ΔG°f por T capturados de janaf.nist.gov, con su tabla
+│   ├── janaf_dgf.json           # ΔG°f por T capturados de janaf.nist.gov, con su tabla (gases y fases de referencia)
+│   ├── ft_s27_maestra.json      # S27 Fischer–Tropsch: ΔG a 500 K y φ de la maestra (Sesión 27, diapositiva Datos)
 │   └── raw/                     # (fotos/pdf de tablas originales; fuera de git)
 ├── tests/
-│   ├── tests.py                 # casos a–n con respuesta conocida (exit 0 = PASS)
+│   ├── tests.py                 # casos a–x con respuesta conocida (exit 0 = PASS)
 │   └── main.py                  # suite original de 4 casos del curso
 ├── plantilla/
 │   ├── plantilla_ejercicio.py   # copia esto para cada ejercicio nuevo (equilibrio; fugacidad="lewis" opcional)
 │   ├── plantilla_presion_fugacidad.py  # 1 reacción gas: y a (T, P) o T para y objetivo, gi | Lewis-Randall
 │   └── plantilla_balance_energia.py  # Q / T flama adiabática / HHV-LHV (2do parcial)
 ├── ejercicios/                  # tareas/clase: ej2, sesión 9, sesión 15, ...
+│   ├── s26_ej1_reformado_gibbs_barrido.py  # S26: reformado 4:1, 600–1100 K, Método A, prueba de fase C(s), gráfica
+│   ├── s26_ej3_h2s_o2_gibbs.py   # S26: H2S + O2, 6 casos a–c, respuesta d) y prueba de fase con S(ref)
+│   ├── s27_fischer_tropsch.py    # S27: FT con/sin ASF, con/sin φ, 3 alimentaciones, % en peso, Pregunta A
+│   ├── s28_lagrange_reformado.py # S28: sistema de Lagrange explícito (Koretsky 9.45–9.47), 4:1 y 2:3, C(s)
+│   ├── s28_si_epitaxial_lagrange.py  # S28: Si epitaxial por Lagrange con prueba de fase vs s24_ej3
+│   ├── s26_ej1_reformado.gms, s26_ej3_h2s.gms, s27_fischer_tropsch.gms, s28_si_lagrange.gms  # GAMS (NLP + CNS, IPOPT)
+│   └── RESUMEN_s26_s28.md        # resultados, respuestas, supuestos e inconsistencias de S26–S28
 ├── notebooks/                   # estudio (00_teoria) y versión-reporte (ej2_reporte); NO canónicos
 │   └── entrega_s15/             # entregable de la sesión 15
 ├── examenes/

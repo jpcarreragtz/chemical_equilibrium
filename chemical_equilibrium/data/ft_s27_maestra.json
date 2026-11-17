@@ -1,0 +1,30 @@
+{
+  "_meta": {
+    "descripcion": "Fischer–Tropsch a 500 K y 25 bar: ΔG a 500 K (J/mol) y coeficiente de fugacidad φ de cada especie, tal como los da la maestra.",
+    "fuente": "Sesión 27, diapositiva Datos",
+    "T_K": 500,
+    "P_bar": 25,
+    "notas": "Las parafinas Ck son CkH(2k+2). Los ΔG de C1, CO, CO2 y H2O son ΔfG de JANAF a 500 K redondeados (diferencias de 1, 14, 39 y 1 J/mol). De C2 a C15 suben 16300 J/mol por CH2 (de C1 a C2, 15260)."
+  },
+  "especies": {
+    "CH4":    {"etiqueta": "C1",  "dG_500K": -32740,  "phi": 0.99},
+    "C2H6":   {"etiqueta": "C2",  "dG_500K": -17480,  "phi": 0.95},
+    "C3H8":   {"etiqueta": "C3",  "dG_500K": -1180,   "phi": 0.89},
+    "C4H10":  {"etiqueta": "C4",  "dG_500K": 15120,   "phi": 0.82},
+    "C5H12":  {"etiqueta": "C5",  "dG_500K": 31420,   "phi": 0.74},
+    "C6H14":  {"etiqueta": "C6",  "dG_500K": 47720,   "phi": 0.66},
+    "C7H16":  {"etiqueta": "C7",  "dG_500K": 64020,   "phi": 0.58},
+    "C8H18":  {"etiqueta": "C8",  "dG_500K": 80320,   "phi": 0.50},
+    "C9H20":  {"etiqueta": "C9",  "dG_500K": 96620,   "phi": 0.43},
+    "C10H22": {"etiqueta": "C10", "dG_500K": 112920,  "phi": 0.36},
+    "C11H24": {"etiqueta": "C11", "dG_500K": 129220,  "phi": 0.30},
+    "C12H26": {"etiqueta": "C12", "dG_500K": 145520,  "phi": 0.25},
+    "C13H28": {"etiqueta": "C13", "dG_500K": 161820,  "phi": 0.21},
+    "C14H30": {"etiqueta": "C14", "dG_500K": 178120,  "phi": 0.17},
+    "C15H32": {"etiqueta": "C15", "dG_500K": 194420,  "phi": 0.14},
+    "CO2":    {"etiqueta": "CO2", "dG_500K": -394900, "phi": 0.97},
+    "H2O":    {"etiqueta": "H2O", "dG_500K": -219050, "phi": 0.88},
+    "H2":     {"etiqueta": "H2",  "dG_500K": 0,       "phi": 1.01},
+    "CO":     {"etiqueta": "CO",  "dG_500K": -155400, "phi": 1.00}
+  }
+}
