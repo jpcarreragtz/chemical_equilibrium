@@ -32,3 +32,6 @@ chemical_equilibrium/examenes/*/grafica_P*.png
 # GAMS: listados y bases de datos regenerables
 *.lst
 *.gdx
+# GAMS: opciones de IPOPT que escribe cada .gms y reportes de resultados regenerables
+ipopt.opt
+chemical_equilibrium/ejercicios/*_resultados.txt

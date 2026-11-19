@@ -1,3 +1,5 @@
+$offListing
+$offSymXRef offSymList
 $title Fischer-Tropsch por minimizacion de Gibbs - Sesion 27 (500 K, 25 bar, 12 escenarios)
 * Ejecutar:  gams s27_fischer_tropsch.gms        (opcional: --salida=archivo.csv)
 * Si la terminal dice "command not found: gams" (no esta en el PATH), usar la ruta completa:
@@ -10,6 +12,8 @@ $title Fischer-Tropsch por minimizacion de Gibbs - Sesion 27 (500 K, 25 bar, 12 
 * phi entra en el logaritmo: gRT(i) + ln(phi_i) + ln(y_i) + ln(P/P0).
 * Datos: Sesion 27, diapositiva Datos (data/ft_s27_maestra.json).
 * SUPUESTO: los analisis 1 y 2 no dicen que b usar; base H2/CO = 2 (C 1, H 4, O 1).
+* Salida: el .lst solo trae los display finales; la tabla de resultados sale en la
+* terminal y en s27_fischer_tropsch_resultados.txt. IPOPT no escribe en la terminal.
 
 Sets
    i  'especies' / CH4, C2H6, C3H8, C4H10, C5H12, C6H14, C7H16, C8H18, C9H20,
@@ -20,7 +24,14 @@ Sets
    e  'elementos' / C, H, O /
    s  'escenarios' / base_noASF_nophi, base_noASF_phi, base_ASF_nophi, base_ASF_phi,
                      bio_noASF_nophi,  bio_noASF_phi,  bio_ASF_nophi,  bio_ASF_phi,
-                     gn_noASF_nophi,   gn_noASF_phi,   gn_ASF_nophi,   gn_ASF_phi / ;
+                     gn_noASF_nophi,   gn_noASF_phi,   gn_ASF_nophi,   gn_ASF_phi /
+   alim 'alimentaciones (el texto es su nombre en el reporte)'
+        / base 'base H2/CO=2 (supuesto)', bio 'biomasa H2/CO=1', gn 'gas natural H2/CO=2.5' /
+   sa(s,alim) 'alimentacion de cada escenario'
+        / (base_noASF_nophi, base_noASF_phi, base_ASF_nophi, base_ASF_phi).base,
+          (bio_noASF_nophi,  bio_noASF_phi,  bio_ASF_nophi,  bio_ASF_phi).bio,
+          (gn_noASF_nophi,   gn_noASF_phi,   gn_ASF_nophi,   gn_ASF_phi).gn /
+   sv 'solves de cada escenario' / NLP, CNS / ;
 
 Parameters
    dG(i)  'J por mol a 500 K (maestra)'
@@ -59,9 +70,18 @@ Table esc(s,*) 'b (C, H, O), ASF (1 = si) y phi (1 = si)'
    gn_ASF_phi           1     5     1     1     1 ;
 
 Parameters  b(e), gRT(i), nS(s,i) 'moles', yS(s,i) 'fraccion mol', nTS(s),
-            estado(s,*) 'model status: NLP (2 = Locally Optimal) y CNS (16 = Solved)' ;
+            estado(s,*) 'model status: NLP (2 = Locally Optimal) y CNS (16 = Solved)'
+            bien(s,sv)  '1 si el solve salio bien (NLP: model status 1 o 2; CNS: 15 a 17)' ;
 Scalars  R / 8.314 /, Tk / 500 /, P / 25 /, P0 / 1 /, alpha / 0.80 /,
          asfOn / 0 /, phiOn / 0 / ;
+
+* IPOPT sin texto en la terminal ni errores de evaluacion en el .lst: las opciones
+* van en ipopt.opt, que se escribe aqui mismo en la carpeta de trabajo.
+$onEcho > ipopt.opt
+print_level 0
+sb yes
+print_eval_error no
+$offEcho
 
 Variables  lnn(i), lnNt, z, lam(e), mu(i) ;
 Equations  balance(e), total, objetivo, E6_ASF(i), potencial(i) ;
@@ -79,7 +99,9 @@ lnn.lo(i) = -700;
 
 Model gibbs / balance, total, objetivo, E6_ASF / ;
 Model kkt   / balance, total, potencial, E6_ASF / ;
-option nlp = ipopt, cns = ipopt, solprint = off;
+* solprint = silent quita tambien el resumen de cada solve (con off se queda).
+option nlp = ipopt, cns = ipopt, limrow = 0, limcol = 0, solprint = silent;
+gibbs.optfile = 1;  kkt.optfile = 1;
 
 gRT(i) = dG(i)/(R*Tk);
 loop(s,
@@ -90,10 +112,12 @@ loop(s,
    mu.l(i)  = 0;
    solve gibbs using nlp minimizing z;
    estado(s,'NLP') = gibbs.modelstat;
+   bien(s,'NLP')   = (gibbs.modelstat <= 2 and gibbs.solvestat = 1);
    lam.l(e) = -balance.m(e);
    mu.l(k)  = -E6_ASF.m(k);
    solve kkt using cns;
    estado(s,'CNS') = kkt.modelstat;
+   bien(s,'CNS')   = (kkt.modelstat >= 15 and kkt.modelstat <= 17 and kkt.solvestat = 1);
    nS(s,i)  = exp(lnn.l(i));
    yS(s,i)  = exp(lnn.l(i) - lnNt.l);
    nTS(s)   = exp(lnNt.l);
@@ -114,4 +138,36 @@ loop((s,i), put s.tl:0 ',y_' i.tl:0 ',' yS(s,i):22:14 / s.tl:0 ',n_' i.tl:0 ',' 
 loop(s, put s.tl:0 ',nT,' nTS(s):22:14 / s.tl:0 ',estado_NLP,' estado(s,'NLP'):22:14 /
            s.tl:0 ',estado_CNS,' estado(s,'CNS'):22:14 /);
 putclose fcsv;
+$endIf
+
+* ---------------------------------------------------------------------------------
+* Reporte de formato fijo, con los titulos de s27_fischer_tropsch.py: se guarda junto a
+* este archivo y se copia a la terminal. Solo cuando este es el archivo que se corre
+* (no cuando otro .gms lo incluye, como la revision automatica de VS Code).
+$ifThen "%system.incParent%" == ""
+Scalars  nTot 'solves corridos', nBien 'solves que salieron bien' ;
+nTot = card(s)*card(sv);  nBien = sum((s,sv), bien(s,sv));
+
+file frep / '%system.fp%%system.fn%_resultados.txt' /;
+frep.pw = 200;  frep.nz = 0;  frep.nr = 2;
+put frep;
+put / '====================================================================================' /
+      'Fischer-Tropsch a 500 K y 25 bar, con y sin ASF y φ   [GAMS, IPOPT]' /
+      '====================================================================================' /
+      'alimentación             ASF  φ         n CH4      n CO2      n H2O   n C5–C15      y CH4      y CO2      y H2O   y C5–C15       n H2       n CO' /;
+loop((s,alim)$sa(s,alim),
+   put alim.te(alim):<25;
+   if(esc(s,'asf'),    put 'sí   ';  else  put 'no   ';);
+   if(esc(s,'usaphi'), put 'sí  ';   else  put 'no  ';);
+   put nS(s,'CH4'):11:4 nS(s,'CO2'):11:4 nS(s,'H2O'):11:4 resumen(s,'C5_C15'):11:4
+       yS(s,'CH4'):11:4 yS(s,'CO2'):11:4 yS(s,'H2O'):11:4 (sum(i$(nc(i) >= 5), yS(s,i))):11:4
+       nS(s,'H2'):11:4  nS(s,'CO'):11:4 /;
+);
+frep.nr = 1;
+put / 'Estado: ' nBien:0:0 ' de ' nTot:0:0 ' solves salieron bien.' /;
+loop((s,sv)$(not bien(s,sv)),
+   put '  No salió bien: ' sv.tl:0 ', escenario ' s.tl:0 ' (model status ' estado(s,sv):0:0 ').' /;
+);
+putclose frep;
+execute 'cat "%system.fp%%system.fn%_resultados.txt"';
 $endIf

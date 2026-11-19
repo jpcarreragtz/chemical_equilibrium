@@ -1,3 +1,5 @@
+$offListing
+$offSymXRef offSymList
 $title Minimizacion de Gibbs - Sesion 25, Ejercicio 2 (steam cracker, 1000 K, 1 bar)
 * Ejecutar:  gams s25_ej2_gibbs.gms
 * Usa IPOPT, que corre sin restriccion con la licencia Free Personal de GAMS.
@@ -6,6 +8,8 @@ $title Minimizacion de Gibbs - Sesion 25, Ejercicio 2 (steam cracker, 1000 K, 1 
 *   1) NLP: minimiza nG/RT. Las especies mayoritarias salen bien, pero las trazas
 *      no: casi no pesan en G y el solver para antes aunque diga "Locally Optimal".
 *   2) CNS: resuelve las condiciones de Lagrange, que si fijan las trazas.
+* Salida: el .lst solo trae los display finales; la tabla de resultados sale en la
+* terminal y en s25_ej2_gibbs_resultados.txt. IPOPT no escribe en la terminal.
 
 Sets
    i  'especies'   / CH4, C2H4, C2H2, CO2, CO, O2, H2, H2O, C2H6 /
@@ -32,6 +36,14 @@ Parameter b(e) 'moles de atomos en la carga' ;
 b(e)   = sum(i, A(e,i)*n0(i));
 gRT(i) = dGf(i)/(R*T);
 
+* IPOPT sin texto en la terminal ni errores de evaluacion en el .lst: las opciones
+* van en ipopt.opt, que se escribe aqui mismo en la carpeta de trabajo.
+$onEcho > ipopt.opt
+print_level 0
+sb yes
+print_eval_error no
+$offEcho
+
 Variables  lnn(i) 'ln de n_i',  lnNt 'ln de los moles totales',  z 'nG entre RT',
            lam(e) 'multiplicador de Lagrange entre RT' ;
 Equations  balance(e), total, objetivo, potencial(i) ;
@@ -49,13 +61,47 @@ lnn.lo(i) = -100;
 
 Model gibbs / balance, total, objetivo / ;
 Model kkt   / balance, total, potencial / ;
-option nlp = ipopt, cns = ipopt;
+* solprint = silent quita tambien el resumen de cada solve (con off se queda).
+option nlp = ipopt, cns = ipopt, limrow = 0, limcol = 0, solprint = silent;
+gibbs.optfile = 1;  kkt.optfile = 1;
 
+Scalars  nTot 'solves corridos' / 2 /, bienNLP, bienCNS ;
 solve gibbs using nlp minimizing z;
+bienNLP = (gibbs.modelstat <= 2 and gibbs.solvestat = 1);
 lam.l(e) = -balance.m(e);
 solve kkt using cns;
+bienCNS = (kkt.modelstat >= 15 and kkt.modelstat <= 17 and kkt.solvestat = 1);
 
 y(i) = exp(lnn.l(i) - lnNt.l);
 logy(i) = log10(y(i));
 option y:6:0:1, logy:4:0:1;
 display y, logy, lam.l;
+
+* ---------------------------------------------------------------------------------
+* Reporte de formato fijo, con los titulos de s25_ej2_steam_cracker_gibbs.py: se guarda junto a
+* este archivo y se copia a la terminal. Solo cuando este es el archivo que se corre
+* (no cuando otro .gms lo incluye, como la revision automatica de VS Code).
+$ifThen "%system.incParent%" == ""
+Alias (i,j);
+Parameters  nEq(i) 'mol en el equilibrio', lugar(i) 'posicion de mayor a menor n_i' ;
+nEq(i)   = exp(lnn.l(i));
+lugar(i) = 1 + sum(j$(nEq(j) > nEq(i)), 1);
+
+file frep / '%system.fp%%system.fn%_resultados.txt' /;
+frep.pw = 200;  frep.nz = 0;
+put frep;
+put / '  T = 1000 K, P = 1 bar   [GAMS, IPOPT]' /
+      '  especie       n_i (mol)           y_i' /;
+frep.nr = 2;
+loop(j, loop(i$(lugar(i) = ord(j)),
+   put '  ' i.tl:<8 nEq(i):15:5 y(i):14:5 /;
+));
+put '  total   ' exp(lnNt.l):15:5 /;
+frep.nr = 1;
+put '  λ/RT: C = ' lam.l('C'):0:4 ', H = ' lam.l('H'):0:4 ', O = ' lam.l('O'):0:4 /;
+put / 'Estado: ' (bienNLP + bienCNS):0:0 ' de ' nTot:0:0 ' solves salieron bien.' /;
+if(not bienNLP, put '  No salió bien: NLP (model status ' gibbs.modelstat:0:0 ').' /;);
+if(not bienCNS, put '  No salió bien: CNS (model status ' kkt.modelstat:0:0 ').' /;);
+putclose frep;
+execute 'cat "%system.fp%%system.fn%_resultados.txt"';
+$endIf

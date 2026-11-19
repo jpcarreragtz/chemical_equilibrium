@@ -137,6 +137,10 @@ y `core.entorno` solo avisa qué falta.
 
 **GAMS.** `gams ejercicios/s27_fischer_tropsch.gms`; si `gams` no está en el
 PATH, `/Library/Frameworks/GAMS.framework/Versions/Current/Resources/gams`.
+Cada `.gms` de S25–S28 imprime al final una tabla de resultados con los títulos
+del `.py` y una línea de estado de los solves, y la guarda en
+`ejercicios/<nombre>_resultados.txt`. El `.lst` solo trae los `display` finales
+e IPOPT no escribe en la terminal. Con `lo=0` la terminal muestra solo la tabla.
 
 ## Cómo correr los tests
 
