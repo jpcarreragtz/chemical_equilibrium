@@ -4,8 +4,12 @@ scipy y matplotlib.
 Uso, en cada script, justo después de poner la raíz del proyecto en sys.path
 y ANTES de importar numpy, scipy o matplotlib:
 
-    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
+    RAIZ = next(p for p in pathlib.Path(__file__).resolve().parents if (p / "core").is_dir())
+    sys.path.insert(0, str(RAIZ))
     import core.entorno  # noqa: F401
+
+La raíz se busca hacia arriba por la carpeta que contiene core/, así que el
+script funciona a cualquier profundidad (ejercicios/sNN_ejN_tema/, examenes/...).
 
 Al importarse:
   * Si numpy, scipy y matplotlib se pueden importar, no hace nada.
