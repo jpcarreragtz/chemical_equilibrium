@@ -33,6 +33,7 @@ chemical_equilibrium/
 ├── plantilla/
 │   ├── plantilla_ejercicio.py   # copia esto para cada ejercicio nuevo (equilibrio; fugacidad="lewis" opcional)
 │   ├── plantilla_presion_fugacidad.py  # 1 reacción gas: y a (T, P) o T para y objetivo, gi | Lewis-Randall
+│   ├── plantilla_gibbs.gms      # GAMS: minimización de Gibbs (NLP + CNS, IPOPT) con salida limpia; base de todo .gms nuevo
 │   └── plantilla_balance_energia.py  # Q / T flama adiabática / HHV-LHV (2do parcial)
 ├── ejercicios/                  # tareas/clase: ej2, sesión 9, sesión 15, ...
 │   ├── s26_ej1_reformado_gibbs_barrido.py  # S26: reformado 4:1, 600–1100 K, Método A, prueba de fase C(s), gráfica
