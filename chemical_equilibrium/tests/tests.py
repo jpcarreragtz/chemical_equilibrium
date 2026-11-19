@@ -22,13 +22,13 @@ Casos:
      core/independencia.py): reformado de CH4, propileno, metanol,
      perclorato de amonio, dependencia y equivalencia de conjuntos
   p) Método matricial con sólido puro: oxidación de H2S con S8(s), π = 2
-  q) Si epitaxial desde SiCl4/SiCl3H a 1300 K (ejercicios/s24_ej3): matrices,
+  q) Si epitaxial desde SiCl4/SiCl3H a 1300 K (ejercicios/s24_ej3_si_epitaxial): matrices,
      K, n_Si(s) con cambio de régimen, R mínimo y verificación contra min G
   r) Criterio de componentes (CLAUDE.md, elegir_componentes): Si epitaxial
      con SiCl4, SiCl3H, H2; reformado; H2S; perclorato; dependencias y errores
   s) ν leída de [−I | −Z] (CLAUDE.md): matrices ν por columnas, Aᵀν = 0,
      escalado a enteros, signo -> lado de la reacción, mismas reacciones
-  t) Perclorato de amonio (ejercicios/s24_ej4): componentes del enunciado,
+  t) Perclorato de amonio (ejercicios/s24_ej4_perclorato): componentes del enunciado,
      [I | Z] con fracciones, ν por columnas y reacciones
   u) Minimización de Gibbs (S25, core/gibbs.py): SVA Ej. 13.14, contraste con
      Método A, steam cracker, trazas, presión, φ, sin arranque y errores
@@ -669,12 +669,17 @@ _EJERCICIOS = {}
 
 
 def cargar_ejercicio(nombre: str):
-    """Importa ejercicios/<nombre>.py una sola vez, sin salida (importados,
-    los ejercicios no escriben en salidas/)."""
+    """Importa ejercicios/<folder>/<nombre>.py una sola vez, sin salida
+    (importados, los ejercicios no escriben en salidas/). Cada ejercicio vive
+    en su propio folder; se busca por el nombre del archivo."""
     if nombre not in _EJERCICIOS:
         import contextlib, importlib.util, io
-        ruta = (pathlib.Path(__file__).resolve().parents[1] / "ejercicios"
-                / f"{nombre}.py")
+        base = pathlib.Path(__file__).resolve().parents[1] / "ejercicios"
+        rutas = sorted(base.glob(f"*/{nombre}.py"))
+        if len(rutas) != 1:
+            raise FileNotFoundError(
+                f"se esperaba un solo ejercicios/*/{nombre}.py y hay {len(rutas)}")
+        ruta = rutas[0]
         spec = importlib.util.spec_from_file_location(nombre, ruta)
         mod = importlib.util.module_from_spec(spec)
         with contextlib.redirect_stdout(io.StringIO()):

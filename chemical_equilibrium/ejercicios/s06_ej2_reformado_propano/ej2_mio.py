@@ -25,7 +25,7 @@ Rendimientos de H2:
 # %% Setup — shim de sys.path e imports
 import sys, pathlib
 try:
-    _RAIZ = pathlib.Path(__file__).resolve().parents[1]          # raíz del proyecto
+    _RAIZ = next(p for p in pathlib.Path(__file__).resolve().parents if (p / "core").is_dir())
 except NameError:                                                # celda/notebook sin __file__
     _RAIZ = next((p for p in [pathlib.Path.cwd(), *pathlib.Path.cwd().parents]
                   if (p / "core" / "exercise.py").exists()), None)

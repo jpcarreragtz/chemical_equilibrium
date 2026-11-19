@@ -14,7 +14,7 @@ $title Si epitaxial por Lagrange con prueba de fase - Sesion 28 (1300 K, 1 bar)
 * Variable: ln(n_i) del gas, sin limite inferior en 0; n_Si libre.
 * Salida: el .lst solo trae los display finales; la tabla de resultados sale en la
 * terminal y en s28_si_lagrange_resultados.txt. IPOPT no escribe en la terminal.
-* Datos: dGf a 1300 K (NIST-JANAF, como ejercicios/s24_ej3_si_epitaxial.py), J/mol.
+* Datos: dGf a 1300 K (NIST-JANAF, como ejercicios/s24_ej3_si_epitaxial/s24_ej3_si_epitaxial.py), J/mol.
 
 Sets
    i   'especies gaseosas' / SiCl2, SiCl4, SiCl3H, SiCl2H2, SiClH3, SiH4, H2, HCl /

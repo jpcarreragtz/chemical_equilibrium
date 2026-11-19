@@ -20,7 +20,8 @@ Q = ΔH°_R + ξ1·ΔH°298,1 + ξ2·ΔH°298,2 + ΔH°_P
 """
 
 import sys, pathlib
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))   # raíz (simulacro/ está 3 niveles abajo)
+RAIZ = next(p for p in pathlib.Path(__file__).resolve().parents if (p / "core").is_dir())
+sys.path.insert(0, str(RAIZ))  # raíz del proyecto
 import core.entorno  # noqa: F401
 
 from core.energia import (C_a_K, F_a_K, T_salida_para_Q, alimentacion_por_atomos,

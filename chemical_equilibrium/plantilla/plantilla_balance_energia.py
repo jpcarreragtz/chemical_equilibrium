@@ -1,8 +1,8 @@
 """PLANTILLA — Balance de energía con reacción / combustión / flama adiabática
 (2do parcial: Sesiones 16–19).  Copia, edita SOLO el bloque INPUTS y corre:
 
-    cp plantilla/plantilla_balance_energia.py ejercicios/ejN_tema.py
-    cd ejercicios && python3 ejN_tema.py
+    cp plantilla/plantilla_balance_energia.py ejercicios/sNN_ejN_tema/sNN_ejN_tema.py
+    python3 ejercicios/sNN_ejN_tema/sNN_ejN_tema.py
 
 Tres modos (elige uno en `modo`):
   "Q"      → conocidas entradas (con su T), avances ξ y T de salida: calcula
@@ -24,7 +24,8 @@ Reglas
 """
 
 import sys, pathlib
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))   # raíz
+RAIZ = next(p for p in pathlib.Path(__file__).resolve().parents if (p / "core").is_dir())
+sys.path.insert(0, str(RAIZ))  # raíz del proyecto
 import core.entorno  # noqa: F401
 
 from core.energia import (C_a_K, F_a_K, T_salida_para_Q, alimentacion_por_atomos,

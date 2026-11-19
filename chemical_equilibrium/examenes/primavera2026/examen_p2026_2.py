@@ -12,7 +12,8 @@ Esperado: xi = 4.392, y_C4H2O3 = 0.0348, y_H2O = 0.139, X_C4H10 = 0.878.
 """
 
 import sys, pathlib
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))  # raíz del proyecto
+RAIZ = next(p for p in pathlib.Path(__file__).resolve().parents if (p / "core").is_dir())
+sys.path.insert(0, str(RAIZ))  # raíz del proyecto
 import core.entorno  # noqa: F401
 
 from core.exercise import run_exercise

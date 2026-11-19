@@ -4,9 +4,9 @@ autovalidación, CSV y gráfica y_i vs T) se calcula solo.
 
 Cómo usarla
 -----------
-1. cp plantilla_ejercicio.py ej<N>_<nombre>.py
+1. cp plantilla/plantilla_ejercicio.py ejercicios/sNN_ejN_tema/sNN_ejN_tema.py
 2. Edita SOLO el bloque INPUTS de abajo.
-3. python3 ej<N>_<nombre>.py
+3. python3 ejercicios/sNN_ejN_tema/sNN_ejN_tema.py
 4. Lee el reporte de AUTOVALIDACIÓN al final de cada T:
    [FAIL] = no confíes; [WARN] = revísalo a mano; [info] 4/5/12 = compara
    con tu derivación (delta_j y n_T, expresión de cada K, factor (P/P0)^δ).
@@ -49,7 +49,7 @@ T = 650–1000 K, con K calculadas de las Tablas C.1/C.4 de SVA.
 # %% Setup — shim de sys.path e imports
 import sys, pathlib
 try:
-    _RAIZ = pathlib.Path(__file__).resolve().parents[1]          # raíz del proyecto
+    _RAIZ = next(p for p in pathlib.Path(__file__).resolve().parents if (p / "core").is_dir())
 except NameError:                                                # celda/notebook sin __file__
     _RAIZ = next((p for p in [pathlib.Path.cwd(), *pathlib.Path.cwd().parents]
                   if (p / "core" / "exercise.py").exists()), None)

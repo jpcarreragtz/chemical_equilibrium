@@ -3,7 +3,8 @@ Alimentación: 1 mol C3H8, 4 mol H2O, 0.5 mol N2 (inerte). P = 1 bar.
 Método A (avance de reacción), 3 reacciones simultáneas."""
 
 import sys, pathlib
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))  # raíz del proyecto
+RAIZ = next(p for p in pathlib.Path(__file__).resolve().parents if (p / "core").is_dir())
+sys.path.insert(0, str(RAIZ))  # raíz del proyecto
 import core.entorno  # noqa: F401
 
 from core.equilibrium import (conversion, format_table, run_checks_method_a,

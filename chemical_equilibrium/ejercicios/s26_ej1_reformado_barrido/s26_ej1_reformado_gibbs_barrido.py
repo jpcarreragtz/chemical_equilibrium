@@ -14,7 +14,8 @@ import io
 import pathlib
 import sys
 
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))  # raíz del proyecto
+RAIZ = next(p for p in pathlib.Path(__file__).resolve().parents if (p / "core").is_dir())
+sys.path.insert(0, str(RAIZ))  # raíz del proyecto
 import core.entorno  # noqa: F401
 
 import numpy as np

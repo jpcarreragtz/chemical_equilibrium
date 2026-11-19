@@ -1,6 +1,6 @@
 """Sesión 28, Ejercicio — Si epitaxial a 1300 K y 1 bar por Lagrange con prueba de fase.
 
-Mismo problema que ejercicios/s24_ej3_si_epitaxial.py (de ahí se importan los
+Mismo problema que ejercicios/s24_ej3_si_epitaxial/s24_ej3_si_epitaxial.py (de ahí se importan los
 datos y los resultados, no se copian), ahora como en la Sesión 28:
   1. Se resuelve solo el gas (SiCl2, SiCl4, SiCl3H, SiCl2H2, SiClH3, SiH4, H2,
      HCl) con las condiciones de Lagrange.
@@ -20,8 +20,8 @@ import io
 import pathlib
 import sys
 
-_RAIZ = pathlib.Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(_RAIZ))  # raíz del proyecto
+RAIZ = next(p for p in pathlib.Path(__file__).resolve().parents if (p / "core").is_dir())
+sys.path.insert(0, str(RAIZ))  # raíz del proyecto
 import core.entorno  # noqa: F401
 
 from scipy.optimize import brentq
@@ -30,9 +30,9 @@ from core.gibbs import minimizar_gibbs, prueba_de_fase, validar_gibbs
 
 
 def importar_s24():
-    """Carga ejercicios/s24_ej3_si_epitaxial.py sin imprimir ni escribir salidas."""
+    """Carga ejercicios/s24_ej3_si_epitaxial/s24_ej3_si_epitaxial.py sin imprimir ni escribir salidas."""
     spec = importlib.util.spec_from_file_location(
-        "s24_ej3", _RAIZ / "ejercicios" / "s24_ej3_si_epitaxial.py")
+        "s24_ej3", RAIZ / "ejercicios" / "s24_ej3_si_epitaxial" / "s24_ej3_si_epitaxial.py")
     mod = importlib.util.module_from_spec(spec)
     with contextlib.redirect_stdout(io.StringIO()):
         spec.loader.exec_module(mod)

@@ -1,8 +1,8 @@
 """PLANTILLA — UNA reacción en fase gas con efecto de la presión y fugacidad
 (2do parcial, Sesión 13 / Problema 1). Copia, edita SOLO el bloque DATOS:
 
-    cp plantilla/plantilla_presion_fugacidad.py ejercicios/ejN_tema.py
-    cd ejercicios && python3 ejN_tema.py
+    cp plantilla/plantilla_presion_fugacidad.py ejercicios/sNN_ejN_tema/sNN_ejN_tema.py
+    python3 ejercicios/sNN_ejN_tema/sNN_ejN_tema.py
 
 Modos (elige uno en `modo`):
   "y_a_T"     → composición de equilibrio a T y P dadas.
@@ -30,7 +30,8 @@ Lewis-Randall → T = 570.4 K con la convención "maestra" (584.5 K rigurosa).
 """
 
 import sys, pathlib
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))   # raíz
+RAIZ = next(p for p in pathlib.Path(__file__).resolve().parents if (p / "core").is_dir())
+sys.path.insert(0, str(RAIZ))  # raíz del proyecto
 import core.entorno  # noqa: F401
 
 import contextlib, io, os

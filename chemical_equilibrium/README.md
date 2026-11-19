@@ -35,16 +35,11 @@ chemical_equilibrium/
 │   ├── plantilla_presion_fugacidad.py  # 1 reacción gas: y a (T, P) o T para y objetivo, gi | Lewis-Randall
 │   ├── plantilla_gibbs.gms      # GAMS: minimización de Gibbs (NLP + CNS, IPOPT) con salida limpia; base de todo .gms nuevo
 │   └── plantilla_balance_energia.py  # Q / T flama adiabática / HHV-LHV (2do parcial)
-├── ejercicios/                  # tareas/clase: ej2, sesión 9, sesión 15, ...
-│   ├── s26_ej1_reformado_gibbs_barrido.py  # S26: reformado 4:1, 600–1100 K, Método A, prueba de fase C(s), gráfica
-│   ├── s26_ej3_h2s_o2_gibbs.py   # S26: H2S + O2, 6 casos a–c, respuesta d) y prueba de fase con S(ref)
-│   ├── s27_fischer_tropsch.py    # S27: FT con/sin ASF, con/sin φ, 3 alimentaciones, % en peso, Pregunta A
-│   ├── s28_lagrange_reformado.py # S28: sistema de Lagrange explícito (Koretsky 9.45–9.47), 4:1 y 2:3, C(s)
-│   ├── s28_si_epitaxial_lagrange.py  # S28: Si epitaxial por Lagrange con prueba de fase vs s24_ej3
-│   ├── s26_ej1_reformado.gms, s26_ej3_h2s.gms, s27_fischer_tropsch.gms, s28_si_lagrange.gms  # GAMS (NLP + CNS, IPOPT)
-│   └── RESUMEN_s26_s28.md        # resultados, respuestas, supuestos e inconsistencias de S26–S28
+├── ejercicios/                  # un folder por ejercicio, con su .py y su .gms juntos
+│   ├── README.md                # ÍNDICE: folder, sesión, tema, método y resultado clave
+│   ├── RESUMEN_s26_s28.md       # resultados, respuestas, supuestos e inconsistencias de S26–S28
+│   └── sNN_ejN_tema/            # 14 folders, de s06_ej2_reformado_propano/ a s28_ej2_si_epitaxial/
 ├── notebooks/                   # estudio (00_teoria) y versión-reporte (ej2_reporte); NO canónicos
-│   └── entrega_s15/             # entregable de la sesión 15
 ├── examenes/
 │   ├── parcial1_otono2026/      # parcial1_p1/p2/p3.py (ejecutables)
 │   │   ├── entrega_parcial1/    # CONGELADA: evidencia entregada el 15/09/2026
@@ -58,11 +53,16 @@ chemical_equilibrium/
 ## Cómo hacer un ejercicio nuevo
 
 ```bash
-cp plantilla/plantilla_ejercicio.py ejercicios/ejN_tema.py
+mkdir ejercicios/sNN_ejN_tema
+cp plantilla/plantilla_ejercicio.py ejercicios/sNN_ejN_tema/sNN_ejN_tema.py
+cp plantilla/plantilla_gibbs.gms    ejercicios/sNN_ejN_tema/sNN_ejN_tema.gms   # si lleva GAMS
 # edita SOLO el bloque INPUTS (reacciones como texto, alimentación, fase,
 # P, T, K directas o especies_termo para calcular K(T) del JSON)
-cd ejercicios && python3 ejN_tema.py
+python3 ejercicios/sNN_ejN_tema/sNN_ejN_tema.py
 ```
+
+Cada ejercicio vive en su propio folder y se agrega una fila al índice
+[ejercicios/README.md](ejercicios/README.md).
 
 Lee el reporte de AUTOVALIDACIÓN: `[FAIL]` = no confíes, `[WARN]` = revisa
 a mano, `[info]` 4/5/12 = compara δ_j y n_T(ξ), la expresión simbólica de
@@ -71,7 +71,8 @@ quedan en `salidas/`.
 
 ## Ejecutar por celdas en VS Code (tablas y gráficas inline)
 
-`plantilla/plantilla_ejercicio.py` y `ejercicios/ej2_mio.py` están divididos
+`plantilla/plantilla_ejercicio.py` y
+`ejercicios/s06_ej2_reformado_propano/ej2_mio.py` están divididos
 en celdas con marcadores `# %%` (comentarios: no cambian nada al correr
 como script). Para verlos en el Interactive Window:
 
@@ -99,7 +100,7 @@ son para estudiar y para versión-reporte. `00_teoria.ipynb` explica ec.
 `core.thermo` (K_WGS(1100 K) ≈ 1.006, K_NH3(298 K) ≈ 762, K_NH3(500 K) ≈
 0.316); `ej2_reporte.ipynb` importa el solver desde `core`, agrega la
 derivación, tablas y gráfica, y termina en selfcheck (mismos números que
-`ejercicios/ej2_mio.py`). Se regeneran con
+`ejercicios/s06_ej2_reformado_propano/ej2_mio.py`). Se regeneran con
 `cd notebooks && jupyter nbconvert --to notebook --execute --inplace *.ipynb`.
 
 ## Cómo correr un ejercicio
@@ -108,15 +109,19 @@ derivación, tablas y gráfica, y termina en selfcheck (mismos números que
 
 ```bash
 cd "/Users/jpcg/Library/Mobile Documents/com~apple~CloudDocs/IBERO/EQ. Químico/chemical_equilibrium"
-python3 ejercicios/s27_fischer_tropsch.py      # o: cd ejercicios && python3 s27_fischer_tropsch.py
+python3 ejercicios/s27_fischer_tropsch/s27_fischer_tropsch.py
+# o: cd ejercicios/s27_fischer_tropsch && python3 s27_fischer_tropsch.py
 ```
 
 La ruta va **entre comillas** porque "Mobile Documents" y "EQ. Químico"
 llevan espacio; sin comillas, `cd` falla con "too many arguments" o "no such
 file or directory".
 
-Cada script de `ejercicios/`, `plantilla/` y `examenes/` importa
-`core.entorno` justo después de poner la raíz en `sys.path`. Si el `python3`
+El índice de todos los ejercicios está en [ejercicios/README.md](ejercicios/README.md).
+
+Cada script de `ejercicios/`, `plantilla/` y `examenes/` busca hacia arriba la
+carpeta que contiene `core/`, la pone en `sys.path` e importa `core.entorno`
+justo después; por eso corre igual a cualquier profundidad. Si el `python3`
 de la terminal no tiene numpy, scipy o matplotlib (por ejemplo
 `/usr/bin/python3`, el 3.9 de Apple, que no tiene scipy y daba
 `ModuleNotFoundError: No module named 'scipy'`), el script se relanza solo
@@ -124,7 +129,7 @@ con `.venv/bin/python`. Si no existe el `.venv`, imprime los comandos para
 crearlo. Para usar el entorno del proyecto de forma explícita:
 
 ```bash
-.venv/bin/python ejercicios/s27_fischer_tropsch.py
+.venv/bin/python ejercicios/s27_fischer_tropsch/s27_fischer_tropsch.py
 ```
 
 **VS Code.** Abre la carpeta `chemical_equilibrium/` (no `EQ. Químico/`: el
@@ -136,12 +141,13 @@ intérprete: `Python: Select Interpreter` → `.venv`. Para correr por celdas
 `# %%`, elige también el kernel `.venv`; un kernel no se puede relanzar solo
 y `core.entorno` solo avisa qué falta.
 
-**GAMS.** `gams ejercicios/s27_fischer_tropsch.gms`; si `gams` no está en el
-PATH, `/Library/Frameworks/GAMS.framework/Versions/Current/Resources/gams`.
-Cada `.gms` de S25–S28 imprime al final una tabla de resultados con los títulos
-del `.py` y una línea de estado de los solves, y la guarda en
-`ejercicios/<nombre>_resultados.txt`. El `.lst` solo trae los `display` finales
-e IPOPT no escribe en la terminal. Con `lo=0` la terminal muestra solo la tabla.
+**GAMS.** Dentro del folder del ejercicio, `gams s27_fischer_tropsch.gms` (o
+"GAMS: Run this file" en VS Code); si `gams` no está en el PATH,
+`/Library/Frameworks/GAMS.framework/Versions/Current/Resources/gams`.
+Cada `.gms` imprime al final una tabla de resultados con los títulos del `.py`
+y una línea de estado de los solves, y la guarda en `<nombre>_resultados.txt`
+junto al `.gms`. El `.lst` solo trae los `display` finales e IPOPT no escribe
+en la terminal. Con `lo=0` la terminal muestra solo la tabla.
 
 ## Cómo correr los tests
 
@@ -150,7 +156,7 @@ python3 tests/tests.py     # o: cd tests && python3 tests.py
 ```
 
 Ambas formas funcionan (cada script ejecutable inserta la raíz del
-proyecto en `sys.path` con un bloque `pathlib ... parents[N]`). Exit 0 =
+proyecto en `sys.path`). Exit 0 =
 todos los casos a–n PASS. `tests/main.py` corre la suite original (4/4).
 
 ## Convención de K_phi (fugacidad en fase gas)

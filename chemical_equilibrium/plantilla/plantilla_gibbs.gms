@@ -1,9 +1,9 @@
 $offListing
 $offSymXRef offSymList
-$title PLANTILLA - Minimizacion de Gibbs en GAMS (copiar a ejercicios/sNN_ejN_nombre.gms)
+$title PLANTILLA - Minimizacion de Gibbs en GAMS (copiar a ejercicios/sNN_ejN_tema/)
 * =================================================================================
 * COMO USARLA
-*   1) Copia este archivo a ejercicios/ con el nombre del ejercicio.
+*   1) Copia este archivo al folder del ejercicio, ejercicios/sNN_ejN_tema/, junto a su .py.
 *   2) Edita SOLO el bloque "DATOS": especies, elementos, dGf, A, n0, T, P y phi.
 *      Los datos de la maestra se usan tal cual; si no los da, JANAF (CLAUDE.md).
 *   3) Corre:  gams <archivo>.gms           (solo la tabla: agrega lo=0)

@@ -30,7 +30,8 @@ K(T) por la ec. 13.18 (ΔH°298 = −90 135 J/mol, ΔG°298 = −24 791 J/mol).
 """
 
 import sys, pathlib
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))   # raíz (simulacro/ está 3 niveles abajo)
+RAIZ = next(p for p in pathlib.Path(__file__).resolve().parents if (p / "core").is_dir())
+sys.path.insert(0, str(RAIZ))  # raíz del proyecto
 import core.entorno  # noqa: F401
 
 import contextlib, io, os

@@ -24,14 +24,15 @@ Tablas SVA/
 chemical_equilibrium/notebooks/.ipynb_checkpoints/
 
 # Salidas regenerables del solver (las entregas congeladas SÍ se versionan:
-# chemical_equilibrium/examenes/.../entrega_parcial1/ y ejercicios/entrega_s15/)
+# chemical_equilibrium/examenes/.../entrega_parcial1/ y ejercicios/s15_etileno_etanol/entrega/)
 chemical_equilibrium/salidas/
 chemical_equilibrium/examenes/*/resultados_P*.csv
 chemical_equilibrium/examenes/*/grafica_P*.png
 
-# GAMS: listados y bases de datos regenerables
+# GAMS: listados y bases de datos regenerables (en cualquier carpeta)
 *.lst
 *.gdx
-# GAMS: opciones de IPOPT que escribe cada .gms y reportes de resultados regenerables
+# GAMS: opciones de IPOPT que escribe cada .gms (en cualquier carpeta) y reportes de
+# resultados regenerables, en ejercicios/ y en cualquiera de sus subfolders
 ipopt.opt
-chemical_equilibrium/ejercicios/*_resultados.txt
+chemical_equilibrium/ejercicios/**/*_resultados.txt

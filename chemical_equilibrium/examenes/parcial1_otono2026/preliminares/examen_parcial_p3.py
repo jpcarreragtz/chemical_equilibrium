@@ -10,7 +10,8 @@ K(T) de las Tablas C.4/C.1 de SVA vía ec. 13.18 (data/sva_tables.json).
 """
 
 import sys, pathlib
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))  # raíz del proyecto
+RAIZ = next(p for p in pathlib.Path(__file__).resolve().parents if (p / "core").is_dir())
+sys.path.insert(0, str(RAIZ))  # raíz del proyecto
 import core.entorno  # noqa: F401
 
 from core.exercise import run_exercise

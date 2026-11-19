@@ -2,7 +2,7 @@
 
 Generado el 2026-11-17 a partir de los ejercicios de `ejercicios/` (Python es la versión canónica; GAMS es la segunda vía). ΔG°f de JANAF consultados el 2026-11-17 y cotejados contra log Kf (|Δ| ≤ 0.018 kJ/mol). R = 8.314 J/(mol·K) en `core`.
 
-Para correr: `.venv/bin/python ejercicios/<archivo>.py` desde `chemical_equilibrium/`; GAMS: `/Library/Frameworks/GAMS.framework/Versions/Current/Resources/gams <archivo>.gms` (opcional `--salida=archivo.csv`). Cada `.gms` imprime al final su tabla de resultados y la línea de estado de los solves, y las guarda en `<archivo>_resultados.txt`; con `lo=0` la terminal muestra solo eso.
+Cada ejercicio está en su folder (ver el índice [README.md](README.md)). Para correr: `.venv/bin/python ejercicios/<folder>/<archivo>.py` desde `chemical_equilibrium/`; GAMS, dentro del folder del ejercicio: `/Library/Frameworks/GAMS.framework/Versions/Current/Resources/gams <archivo>.gms` (opcional `--salida=archivo.csv`). Cada `.gms` imprime al final su tabla de resultados y la línea de estado de los solves, y las guarda en `<archivo>_resultados.txt`; con `lo=0` la terminal muestra solo eso.
 
 ## S26 Ej1 — Reformado de CH4, H2O:CH4 = 4:1, 1 bar
 
